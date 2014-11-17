@@ -189,9 +189,9 @@ class Fanova(object):
                     labelled_performances.append((pairwise_marginal_performance, label))
             print "Sum of fractions for pairwise interaction effects %.2f%%" % (sum_of_pairwise_marginals)
 
-        sorted_performances = sorted(labelled_performances)
+        sorted_performances = sorted(labelled_performances, reverse=True)
         if max_num is not None:
-            sorted_performances = sorted_performances[-max_num:]
+            sorted_performances = sorted_performances[:max_num]
         for marginal, label in sorted_performances:
             print label
 
