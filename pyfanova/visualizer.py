@@ -47,7 +47,7 @@ class Visualizer(object):
             outfile_name = os.path.join(directory, param1.replace(os.sep, "_") + "x" + param2.replace(os.sep, "_") + ".png")
             plt.clf()
             print "creating %s" % outfile_name
-            self.plot_pairwise_marginal(param1, param2).show()
+            self.plot_pairwise_marginal(param1, param2)
             plt.savefig(outfile_name)
 
     def plot_categorical_marginal(self, param):
