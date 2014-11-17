@@ -5,7 +5,11 @@ Functional ANOVA: an implementation of the ICML 2014 paper "An Efficient Approac
 
 Requirements
 ------------
-Fanova requires [Java 7](https://jdk7.java.net/download.html).
+Fanova requires:
+
+[Java 7](https://jdk7.java.net/download.html).
+
+[Numpy] (https://pypi.python.org/pypi/numpy).
 
 Installation
 ------------
