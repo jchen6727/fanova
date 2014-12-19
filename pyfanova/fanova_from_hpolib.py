@@ -71,7 +71,7 @@ class FanovaFromHPOLib(Fanova):
         fh.write("deterministic = 0\n")
         fh.write("run_obj = qual\n")
         fh.write("overall_obj = mean\n")
-        fh.write("cutoff_time = 1\n")
+        fh.write("cutoff_time = %d\n" % np.iinfo(np.int32).max)
         fh.write("cutoff_length = 0\n")
         fh.write("tunerTimeout = 0\n")
         fh.write("paramfile = .\n")
