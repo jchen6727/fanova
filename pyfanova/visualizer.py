@@ -86,11 +86,10 @@ class Visualizer(object):
         grid_1 = np.linspace(lower_bound_1, upper_bound_1, resolution)
         grid_2 = np.linspace(lower_bound_2, upper_bound_2, resolution)
 
-        xx, yy = np.meshgrid(grid_1, grid_2)
-
+        #xx, yy = np.meshgrid(grid_1, grid_2)
         zz = np.zeros([resolution * resolution])
-        for i, x_value in enumerate(grid_1):
-            for j, y_value in enumerate(grid_2):
+        for i, y_value in enumerate(grid_2):
+            for j, x_value in enumerate(grid_1):
                 zz[i * resolution + j] = self._fanova._get_marginal_for_value_pair(dim1, dim2, x_value, y_value)[0]
 
         zz = np.reshape(zz, [resolution, resolution])
