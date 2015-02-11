@@ -86,7 +86,6 @@ class Visualizer(object):
         grid_1 = np.linspace(lower_bound_1, upper_bound_1, resolution)
         grid_2 = np.linspace(lower_bound_2, upper_bound_2, resolution)
 
-        #xx, yy = np.meshgrid(grid_1, grid_2)
         zz = np.zeros([resolution * resolution])
         for i, y_value in enumerate(grid_2):
             for j, x_value in enumerate(grid_1):

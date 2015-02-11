@@ -176,8 +176,10 @@ class Fanova(object):
 
         main_marginal_performances = [self.get_marginal(i) for i in range(num_params)]
         labelled_performances = []
+
         for marginal, param_name in zip(main_marginal_performances, param_names):
-            labelled_performances.append((marginal, "%.2f%% due to main effect: %s" % (marginal, param_name)))
+            labelled_performances.append((marginal, "%.2f%% due to main effect: %s" % (marginal, param_name), param_name))
+
         print "Sum of fractions for main effects %.2f%%" % (sum(main_marginal_performances))
 
         if pairwise:
@@ -186,14 +188,18 @@ class Fanova(object):
             for pairwise_marginal_performance, param_name1, param_name2 in pairwise_marginal_performance:
                     sum_of_pairwise_marginals += pairwise_marginal_performance
                     label = "%.2f%% due to interaction: %s x %s" % (pairwise_marginal_performance, param_name1, param_name2)
-                    labelled_performances.append((pairwise_marginal_performance, label))
+                    labelled_performances.append((pairwise_marginal_performance, label, param_name1 + " x " + param_name2))
+
             print "Sum of fractions for pairwise interaction effects %.2f%%" % (sum_of_pairwise_marginals)
 
         sorted_performances = sorted(labelled_performances, reverse=True)
+        return_values = []
         if max_num is not None:
             sorted_performances = sorted_performances[:max_num]
-        for marginal, label in sorted_performances:
+        for marginal, label, name in sorted_performances:
             print label
+            return_values.append((marginal, name))
+        return return_values
 
     def _start_fanova(self):
         cmds = ["java",
