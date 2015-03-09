@@ -3,26 +3,24 @@ package net.aclib.fanova;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+
 import java.util.Vector;
 
-import org.apache.commons.collections.map.HashedMap;
 
-import ca.ubc.cs.beta.aclib.configspace.NormalizedRange;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfigurationSpace;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.NormalizedRange;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
 import net.aclib.fanova.model.FunctionalANOVAVarianceDecompose;
 
 public class FanovaRemote {
 	
 	private FunctionalANOVAVarianceDecompose favd;
 	private IPCMechanism ipc;
-	private ParamConfigurationSpace configSpace;
+	private ParameterConfigurationSpace configSpace;
 	private HashMap<String, Integer> param2dim = new HashMap<String, Integer>();
 	
-	public FanovaRemote(FunctionalANOVAVarianceDecompose favd, IPCMechanism ipc, ParamConfigurationSpace configSpace) {
+	public FanovaRemote(FunctionalANOVAVarianceDecompose favd, IPCMechanism ipc, ParameterConfigurationSpace configSpace) {
 		super();
 		this.favd = favd;
 		this.ipc = ipc;

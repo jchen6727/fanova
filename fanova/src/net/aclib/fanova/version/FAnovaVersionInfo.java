@@ -2,8 +2,8 @@ package net.aclib.fanova.version;
 
 import org.mangosdk.spi.ProviderFor;
 
-import ca.ubc.cs.beta.aclib.misc.version.AbstractVersionInfo;
-import ca.ubc.cs.beta.aclib.misc.version.VersionInfo;
+import ca.ubc.cs.beta.aeatk.misc.version.AbstractVersionInfo;
+import ca.ubc.cs.beta.aeatk.misc.version.VersionInfo;
 
 @ProviderFor(VersionInfo.class)
 public class FAnovaVersionInfo extends AbstractVersionInfo {

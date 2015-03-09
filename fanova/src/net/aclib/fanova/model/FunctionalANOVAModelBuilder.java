@@ -8,21 +8,23 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.ubc.cs.beta.aclib.configspace.ParamConfiguration;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfigurationSpace;
-import ca.ubc.cs.beta.aclib.model.ModelBuildingOptions;
-import ca.ubc.cs.beta.aclib.model.builder.AdaptiveCappingModelBuilder;
-import ca.ubc.cs.beta.aclib.model.builder.BasicModelBuilder;
-import ca.ubc.cs.beta.aclib.model.builder.ModelBuilder;
-import ca.ubc.cs.beta.aclib.model.data.DefaultValueForConditionalsMDS;
-import ca.ubc.cs.beta.aclib.model.data.MaskCensoredDataAsUncensored;
-import ca.ubc.cs.beta.aclib.model.data.MaskInactiveConditionalParametersWithDefaults;
-import ca.ubc.cs.beta.aclib.model.data.SanitizedModelData;
-import ca.ubc.cs.beta.aclib.options.RandomForestOptions;
-import ca.ubc.cs.beta.aclib.options.scenario.ScenarioOptions;
-import ca.ubc.cs.beta.aclib.probleminstance.ProblemInstance;
-import ca.ubc.cs.beta.aclib.random.SeedableRandomPool;
-import ca.ubc.cs.beta.aclib.runhistory.RunHistory;
+import ca.ubc.cs.beta.aeatk.algorithmrunresult.AlgorithmRunResult;
+import ca.ubc.cs.beta.aeatk.model.ModelBuildingOptions;
+import ca.ubc.cs.beta.aeatk.model.builder.AdaptiveCappingModelBuilder;
+import ca.ubc.cs.beta.aeatk.model.builder.BasicModelBuilder;
+import ca.ubc.cs.beta.aeatk.model.builder.ModelBuilder;
+import ca.ubc.cs.beta.aeatk.model.data.DefaultValueForConditionalsMDS;
+import ca.ubc.cs.beta.aeatk.model.data.MaskCensoredDataAsUncensored;
+import ca.ubc.cs.beta.aeatk.model.data.MaskInactiveConditionalParametersWithDefaults;
+import ca.ubc.cs.beta.aeatk.model.data.SanitizedModelData;
+import ca.ubc.cs.beta.aeatk.options.RandomForestOptions;
+import ca.ubc.cs.beta.aeatk.options.scenario.ScenarioOptions;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfiguration;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
+import ca.ubc.cs.beta.aeatk.probleminstance.ProblemInstance;
+import ca.ubc.cs.beta.aeatk.random.SeedableRandomPool;
+import ca.ubc.cs.beta.aeatk.runhistory.RunHistory;
+import ca.ubc.cs.beta.aeatk.runhistory.RunHistoryHelper;
 import ca.ubc.cs.beta.models.fastrf.RandomForest;
 
 /**
@@ -46,11 +48,12 @@ public class FunctionalANOVAModelBuilder {
 	/**
 	 * Last build of sanitized data
 	 */
-	private SanitizedModelData sanitizedData;
+	private ca.ubc.cs.beta.aeatk.model.data.SanitizedModelData sanitizedData;
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	public void learnModel(List<ProblemInstance> instances, RunHistory runHistory, ParamConfigurationSpace configSpace, RandomForestOptions rfOptions, ModelBuildingOptions mbOptions, ScenarioOptions scenarioOptions, boolean adaptiveCapping, SeedableRandomPool pool) 
+	public void learnModel(List<ProblemInstance> instances, RunHistory runHistory, ParameterConfigurationSpace configSpace, 
+			RandomForestOptions rfOptions, ModelBuildingOptions mbOptions, ScenarioOptions scenarioOptions, boolean adaptiveCapping, SeedableRandomPool pool) 
 	{
 		
 		/*
@@ -81,7 +84,7 @@ public class FunctionalANOVAModelBuilder {
 		
 		//=== The following two sets are required to be sorted by instance and paramConfig ID.
 		Set<ProblemInstance> all_instances = new LinkedHashSet<ProblemInstance>(instances);
-		Set<ParamConfiguration> paramConfigs = runHistory.getUniqueParamConfigurations();
+		Set<ParameterConfiguration> paramConfigs = runHistory.getUniqueParamConfigurations();
 		
 		Set<ProblemInstance> runInstances=runHistory.getUniqueInstancesRan();
 		ArrayList<Integer> runInstancesIdx = new ArrayList<Integer>(all_instances.size());
@@ -102,7 +105,7 @@ public class FunctionalANOVAModelBuilder {
 		//=== Get the parameter configuration matrix (Theta).
 		double[][] thetaMatrix = new double[paramConfigs.size()][];
 		i = 0;
-		for(ParamConfiguration pc : paramConfigs)
+		for(ParameterConfiguration pc : paramConfigs)
 		{
 			if(mbOptions.maskInactiveConditionalParametersAsDefaultValue)
 			{
@@ -120,9 +123,10 @@ public class FunctionalANOVAModelBuilder {
 			usedInstanceIdxs[j] = runInstancesIdx.get(j);
 		}
 		
-		double[] runResponseValues = runHistory.getRunResponseValues();
-		boolean[] censored = runHistory.getCensoredFlagForRuns();
-		
+		List<AlgorithmRunResult> runs = runHistory.getAlgorithmRunsExcludingRedundant();
+		double[] runResponseValues = RunHistoryHelper.getRunResponseValues(runs, runHistory.getRunObjective());
+		boolean[] censored = RunHistoryHelper.getCensoredEarlyFlagForRuns(runs);
+
 		
 		if(mbOptions.maskCensoredDataAsKappaMax)
 		{
@@ -155,7 +159,8 @@ public class FunctionalANOVAModelBuilder {
 		
 		
 		
-		SanitizedModelData sanitizedData = new DefaultValueForConditionalsMDS(instanceFeatureMatrix, thetaMatrix, runResponseValues, usedInstanceIdxs, rfOptions.logModel,runHistory.getParameterConfigurationInstancesRanByIndex(), runHistory.getCensoredFlagForRuns(), configSpace);
+		SanitizedModelData sanitizedData = new DefaultValueForConditionalsMDS(instanceFeatureMatrix, thetaMatrix, runResponseValues, usedInstanceIdxs,
+				rfOptions.logModel,runHistory.getParameterConfigurationInstancesRanByIndexExcludingRedundant(), RunHistoryHelper.getCensoredEarlyFlagForRuns(runs), configSpace);
 		
 		if(mbOptions.maskCensoredDataAsUncensored)
 		{

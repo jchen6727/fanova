@@ -1,6 +1,6 @@
 package net.aclib.fanova.options;
 
-import ca.ubc.cs.beta.aclib.misc.options.NoArgumentHandler;
+import ca.ubc.cs.beta.aeatk.misc.options.NoArgumentHandler;
 
 public class FAnovaNoArgumentHandler implements NoArgumentHandler {
 

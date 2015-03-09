@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.aclib.fanova.eval.ModelEvaluation;
-import ca.ubc.cs.beta.aclib.algorithmrun.AlgorithmRun;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfigurationSpace;
+import ca.ubc.cs.beta.aeatk.algorithmrunresult.AlgorithmRunResult;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
 import ca.ubc.cs.beta.models.fastrf.RandomForest;
 
 public class FunctionalANOVAVarianceDecompose {
@@ -29,8 +29,8 @@ public class FunctionalANOVAVarianceDecompose {
 	private HashMap<HashSet<Integer>,Double> thisTreeVarianceContributions = new HashMap<HashSet<Integer>,Double>(); 
 	private HashMap<HashSet<Integer>,Double> totalFractionsExplained = new HashMap<HashSet<Integer>,Double>();
 
-	public FunctionalANOVAVarianceDecompose(RandomForest existingForest, List<AlgorithmRun> testRuns,
-			ParamConfigurationSpace configSpace, Random rand, 
+	public FunctionalANOVAVarianceDecompose(RandomForest existingForest, List<AlgorithmRunResult> testRuns,
+			ParameterConfigurationSpace configSpace, Random rand, 
 			boolean compareToDef, double quantileToCompareTo, boolean logModel) throws IOException, InterruptedException 
 	{
 		forest = ModelEvaluation.extractMarginalForest(existingForest, testRuns, configSpace, rand, compareToDef, quantileToCompareTo);

@@ -7,10 +7,10 @@ import java.util.Set;
 import org.apache.commons.math.stat.descriptive.AbstractUnivariateStatistic;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
-import ca.ubc.cs.beta.aclib.algorithmrun.AlgorithmRun;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfiguration;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfigurationSpace;
-import ca.ubc.cs.beta.aclib.probleminstance.ProblemInstance;
+import ca.ubc.cs.beta.aeatk.algorithmrunresult.AlgorithmRunResult;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfiguration;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
+import ca.ubc.cs.beta.aeatk.probleminstance.ProblemInstance;
 import ca.ubc.cs.beta.models.fastrf.RandomForest;
 import ca.ubc.cs.beta.models.fastrf.RegtreeBuildParams;
 
@@ -31,7 +31,7 @@ public class ModelEvaluation {
 	
 	
 
-	public static RandomForest extractMarginalForest(RandomForest forest, List<AlgorithmRun> testRuns, ParamConfigurationSpace configFile, Random rand,  boolean compareToDefault, double quantileToCompareTo){
+	public static RandomForest extractMarginalForest(RandomForest forest, List<AlgorithmRunResult> testRuns, ParameterConfigurationSpace configFile, Random rand,  boolean compareToDefault, double quantileToCompareTo){
 //	public static RandomForest extractMarginalForest(String surrogateZipFilename){
 //		QuickZip surrogateZip = new QuickZip(surrogateZipFilename);
 		System.out.println("Extracing marginal forest from surrogateZip file.");
@@ -41,8 +41,8 @@ public class ModelEvaluation {
 
 		/* Get all features, X, in double[][] format. */
 		Set<ProblemInstance> uniqInstances = new HashSet<ProblemInstance>();
-		for(AlgorithmRun run : testRuns){
-			uniqInstances.add( run.getRunConfig().getProblemInstanceSeedPair().getInstance() );
+		for(AlgorithmRunResult run : testRuns){
+			uniqInstances.add( run.getProblemInstanceSeedPair().getProblemInstance());
 			//System.out.println(run.getRuntime());
 		}
 		double[][] X = new double[uniqInstances.size()][];
@@ -56,13 +56,13 @@ public class ModelEvaluation {
 
 		/* Get all unique configurations, uniqTheta, in double[][] format. */
 		int numParams = -1;
-		Set<ParamConfiguration> uniqConfigurations = new HashSet<ParamConfiguration>();
-		for(AlgorithmRun run : testRuns){
-			uniqConfigurations.add( run.getRunConfig().getParamConfiguration() );
+		Set<ParameterConfiguration> uniqConfigurations = new HashSet<ParameterConfiguration>();
+		for(AlgorithmRunResult run : testRuns){
+			uniqConfigurations.add( run.getParameterConfiguration());
 		}
 		double[][] uniqTheta = new double[uniqConfigurations.size()][];
 		i=0;
-		for(ParamConfiguration config: uniqConfigurations){
+		for(ParameterConfiguration config: uniqConfigurations){
 			double[] valueArray = config.toValueArray();
 			numParams = valueArray.length;
 			uniqTheta[i] = valueArray;
@@ -94,9 +94,9 @@ public class ModelEvaluation {
         
         //=== Get 10,000 random param configs, using fixed seed.
         int numRandomConfigs = 1000; // was:10000
-        ParamConfiguration[] randConfigs = new ParamConfiguration[numRandomConfigs];
+        ParameterConfiguration[] randConfigs = new ParameterConfiguration[numRandomConfigs];
         for(int num=0; num<numRandomConfigs; num++){
-        	randConfigs[num] = configFile.getRandomConfiguration(r);	
+        	randConfigs[num] = configFile.getRandomParameterConfiguration(r);	
         }
 
         //=== Compute quantile marginal prediction over the random configs.

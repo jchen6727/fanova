@@ -10,6 +10,24 @@ class Visualizer(object):
 
     def __init__(self, fanova):
         self._fanova = fanova
+        self._latex_template = '''\documentclass[letterpaper]{article}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{subfigure}
+\usepackage{lscape}
+\begin{document}
+\title{Functional ANOVA Analysis}
+\maketitle
+\textbf{When using parts of this document, please cite the functional ANOVA paper (the reference will be available soon; in the meantime please ask Frank for details).}
+%begin{figure}[tbp]\\
+%begin{center}\\
+%includegraphics{" + singleMarginalOutputFile + "}\\
+%caption{Marginal predictions for parameter " + parameterName.replace("_", "\\_") + ". This marginal explains " + decim2.format(fractionExplainedByThisMarginal) + "\\% of the predictor's total variance. 
+%label{fig:" + parameterName + "}}\\
+%end{center}\\
+%end{figure}\\
+\end{document}'''
 
     def create_all_plots(self, directory, **kwargs):
         """
@@ -114,7 +132,9 @@ class Visualizer(object):
             dim = param
             param_name = self._fanova.get_config_space().get_parameter_names()[dim]
         else:
-            assert param in self._fanova.param_name2dmin, "param %s not known" % param
+            if param not in self._fanova.param_name2dmin:
+                print "Parameter %s not known" % param
+                return
             dim = self._fanova.param_name2dmin[param]
             param_name = param
 
@@ -144,3 +164,9 @@ class Visualizer(object):
 
         plt.ylabel("Performance")
         return plt
+    
+    def create_pdf_file(self):
+        latex_doc = self._latex_template
+        with open("fanova_output.tex", "w") as fh:
+            fh.write(latex_doc)        
+            subprocess.call('pdflatex fanova_output.tex')

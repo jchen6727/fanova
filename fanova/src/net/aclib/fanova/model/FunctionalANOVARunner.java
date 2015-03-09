@@ -15,11 +15,12 @@ import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import net.aclib.fanova.eval.ModelEvaluation;
-import ca.ubc.cs.beta.aclib.algorithmrun.AlgorithmRun;
-import ca.ubc.cs.beta.aclib.configspace.NormalizedRange;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfiguration;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfigurationSpace;
+import ca.ubc.cs.beta.aeatk.algorithmrunresult.AlgorithmRunResult;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.NormalizedRange;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfiguration;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
 import ca.ubc.cs.beta.models.fastrf.RandomForest;
 
 // Sample input:   --restore-scenario /ubc/cs/home/h/hutter/orcinus/home/hutter/clasp_data/fanova-clasp/smac-output/RunGroup-2013-06-20--11-13-55-400/state-run4 --num-run 1 --algo-exec dummy --algo-exec-dir . --cutoff_time 120
@@ -39,7 +40,7 @@ public class FunctionalANOVARunner {
 		return l;
 	}
 
-	public static void decomposeVariance(RandomForest existingForest, List<AlgorithmRun> testRuns,ParamConfigurationSpace configSpace,Random rand, boolean compareToDef, double quantileToCompareTo, boolean computePairwiseInteraction, String outputDir, boolean logModel, boolean plotMarginals) throws IOException, InterruptedException {
+	public static void decomposeVariance(RandomForest existingForest, List<AlgorithmRunResult> testRuns,ParameterConfigurationSpace configSpace,Random rand, boolean compareToDef, double quantileToCompareTo, boolean computePairwiseInteraction, String outputDir, boolean logModel, boolean plotMarginals) throws IOException, InterruptedException {
 		//=== Extract and preprocess forest.
 		RandomForest forest = ModelEvaluation.extractMarginalForest(existingForest, testRuns, configSpace, rand, compareToDef, quantileToCompareTo);
 		RandomForestPreprocessor.preprocessRandomForest(forest, configSpace);

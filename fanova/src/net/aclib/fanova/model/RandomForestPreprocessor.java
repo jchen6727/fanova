@@ -3,19 +3,19 @@ package net.aclib.fanova.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import ca.ubc.cs.beta.aclib.configspace.ParamConfigurationSpace;
+import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
 import ca.ubc.cs.beta.models.fastrf.RandomForest;
 import ca.ubc.cs.beta.models.fastrf.Regtree;
 
 public class RandomForestPreprocessor {
-	public static void preprocessRandomForest(RandomForest forest, ParamConfigurationSpace configSpace){
+	public static void preprocessRandomForest(RandomForest forest, ParameterConfigurationSpace configSpace){
 		int[] categoricalSize = configSpace.getCategoricalSize(); 
 		int dim = categoricalSize.length;
 		
 		//=== Determine categorical parameters.
 		boolean[] isCat = new boolean[dim];
 		for (int i=0; i<dim; i++){
-			isCat[i] = (categoricalSize[i] != ParamConfigurationSpace.INVALID_CATEGORICAL_SIZE);
+			isCat[i] = (categoricalSize[i] != ParameterConfigurationSpace.INVALID_CATEGORICAL_SIZE);
 		}
 		
 		//=== Build array holdings categorical parameter domains (one set per categorical parameter).
@@ -42,7 +42,7 @@ public class RandomForestPreprocessor {
 		
 	}
 	
-	public static double computeTotalVarianceOfRegressionTree(Regtree regtree, ParamConfigurationSpace configSpace){
+	public static double computeTotalVarianceOfRegressionTree(Regtree regtree, ParameterConfigurationSpace configSpace){
 		HashSet<Integer> allVariableIndices = new HashSet<Integer>();
 		for(int j=0; j<configSpace.getCategoricalSize().length; j++){
 			allVariableIndices.add(new Integer(j));
@@ -52,7 +52,7 @@ public class RandomForestPreprocessor {
 		return totalVariance;
 	}
 	
-	public static HashMap<Integer,Double> getUpToKaryVarianceContributions(Regtree regtree, ParamConfigurationSpace configSpace, int k){
+	public static HashMap<Integer,Double> getUpToKaryVarianceContributions(Regtree regtree, ParameterConfigurationSpace configSpace, int k){
 		if (k>4){
 			throw new IllegalArgumentException("Computation of k-ary variance contributions only implemented for K up to 4.");
 		}
