@@ -5,4 +5,5 @@ Functional ANOVA: an implementation of the ICML 2014 paper "An Efficient Approac
 
 Documentation
 ------------
-(fanova.readthedocs.org).
+
+[![Documentation Status](http://fanova.readthedocs.org)](http://fanova.readthedocs.org)
