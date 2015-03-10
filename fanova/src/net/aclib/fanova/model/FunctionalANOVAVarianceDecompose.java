@@ -95,18 +95,26 @@ public class FunctionalANOVAVarianceDecompose {
 					Collections.sort(splitPoints);
 					
 					//=== Set the observations to consider as the mid points between the split points.
-					if( splitPoints.size() == 2 ){
-						// The tree does not split on this dimension => dimension not important.
-						allObservations[numTree][dim] = new double[0];
-						allIntervalSizes[numTree][dim] = new double[0];
-					} else {
-						allObservations[numTree][dim] = new double[splitPoints.size()-1];
-						allIntervalSizes[numTree][dim] = new double[splitPoints.size()-1];
-						for(int lowerIntervalId=0; lowerIntervalId<splitPoints.size()-1; lowerIntervalId++){
-							allObservations[numTree][dim][lowerIntervalId] = (splitPoints.get(lowerIntervalId) + splitPoints.get(lowerIntervalId+1))/2;
-							allIntervalSizes[numTree][dim][lowerIntervalId] = splitPoints.get(lowerIntervalId+1) - splitPoints.get(lowerIntervalId);
-						}
+//					if( splitPoints.size() == 2 ){
+//						// The tree does not split on this dimension => dimension not important.
+//						allObservations[numTree][dim] = new double[0];
+//						allIntervalSizes[numTree][dim] = new double[0];
+//					} else {
+//						allObservations[numTree][dim] = new double[splitPoints.size()-1];
+//						allIntervalSizes[numTree][dim] = new double[splitPoints.size()-1];
+//						for(int lowerIntervalId=0; lowerIntervalId<splitPoints.size()-1; lowerIntervalId++){
+//							allObservations[numTree][dim][lowerIntervalId] = (splitPoints.get(lowerIntervalId) + splitPoints.get(lowerIntervalId+1))/2;
+//							allIntervalSizes[numTree][dim][lowerIntervalId] = splitPoints.get(lowerIntervalId+1) - splitPoints.get(lowerIntervalId);
+//						}
+//					}
+					//=== For dimensions the tree does not split at we still need a single observation to get correct pairwise marginals.
+					allObservations[numTree][dim] = new double[splitPoints.size()-1];
+					allIntervalSizes[numTree][dim] = new double[splitPoints.size()-1];
+					for(int lowerIntervalId=0; lowerIntervalId<splitPoints.size()-1; lowerIntervalId++){
+						allObservations[numTree][dim][lowerIntervalId] = (splitPoints.get(lowerIntervalId) + splitPoints.get(lowerIntervalId+1))/2;
+						allIntervalSizes[numTree][dim][lowerIntervalId] = splitPoints.get(lowerIntervalId+1) - splitPoints.get(lowerIntervalId);
 					}
+
 				}
 			}	
 		}
