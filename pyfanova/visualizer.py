@@ -165,8 +165,8 @@ class Visualizer(object):
         plt.ylabel("Performance")
         return plt
     
-    def create_pdf_file(self):
-        latex_doc = self._latex_template
-        with open("fanova_output.tex", "w") as fh:
-            fh.write(latex_doc)        
-            subprocess.call('pdflatex fanova_output.tex')
+#     def create_pdf_file(self):
+#         latex_doc = self._latex_template
+#         with open("fanova_output.tex", "w") as fh:
+#             fh.write(latex_doc)        
+#             subprocess.call('pdflatex fanova_output.tex')
