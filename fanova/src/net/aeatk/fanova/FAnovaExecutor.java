@@ -1,11 +1,9 @@
-package net.aclib.fanova;
+package net.aeatk.fanova;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +26,12 @@ import ca.ubc.cs.beta.aeatk.state.StateDeserializer;
 import ca.ubc.cs.beta.aeatk.state.StateFactory;
 import ca.ubc.cs.beta.aeatk.state.StateFactoryOptions;
 import ca.ubc.cs.beta.aeatk.state.legacy.LegacyStateFactory;
-import ca.ubc.cs.beta.models.fastrf.RandomForest;
-import net.aclib.fanova.model.FunctionalANOVARunner;
-import net.aclib.fanova.model.FunctionalANOVAModelBuilder;
-import net.aclib.fanova.model.FunctionalANOVAVarianceDecompose;
-import net.aclib.fanova.options.FAnovaOptions;
-import net.aclib.fanova.options.FAnovaOptions.Improvements;
+
+import net.aeatk.fanova.model.FunctionalANOVAModelBuilder;
+import net.aeatk.fanova.model.FunctionalANOVARunner;
+import net.aeatk.fanova.model.FunctionalANOVAVarianceDecompose;
+import net.aeatk.fanova.options.FAnovaOptions;
+import net.aeatk.fanova.options.FAnovaOptions.Improvements;
 
 public class FAnovaExecutor {
 	private static Logger log;
@@ -47,7 +45,6 @@ public class FAnovaExecutor {
 			try {
 				FAnovaOptions fanovaOpts = new FAnovaOptions();
 				JCommander jcom;
-				;
 				
 				//Manhandle the options to support --restoreScenario
 				args = StateFactoryOptions.processScenarioStateRestore(args);
@@ -109,77 +106,25 @@ public class FAnovaExecutor {
 				    }
 				    rh = subsampledRH;
 				}
-				
-//				ReadCVS obj = new ReadCVS();
-//				obj.run();
-//
-//				FunctionalANOVAModelBuilderFromCSV famb = new FunctionalANOVAModelBuilderFromCSV();
-//				famb.learnModel(obj.getX(), obj.getY(), fanovaOpts.rfOptions, pool);
-
 				FunctionalANOVAModelBuilder famb = new FunctionalANOVAModelBuilder();
 				famb.learnModel(instances, rh, configSpace, fanovaOpts.rfOptions, fanovaOpts.mbOptions, scenarioOptions, true, pool);
-				//RandomForest rf = famb. 
+ 
 
 				//=== Handle fANOVA options.
 				boolean compareToDef = fanovaOpts.compare.equals(Improvements.DEFAULT) ? true : false;
 				double quantile = fanovaOpts.compare.equals(Improvements.QUANTILE) ? fanovaOpts.quantileToCompare : -1;
 
-				
-				/*
-				 * Old code loading forest from a file.
 
-		//String prefix = "/ubc/cs/home/h/hutter/orcinus/home/hutter/experiments/surrogates/otherData/";
-		//String surrogateZipFilename = prefix + name;
-
-		//PrintWriter writer = null;
-		//			extension = "_1tree_" + extension;
-
-		//QuickZip surrogateZip = new QuickZip(surrogateZipFilename);
-
-		
-		//ParamConfigurationSpace configSpace = (ParamConfigurationSpace) surrogateZip.getObject(ZipFileName.CONFIG_SPACE_FILE);
-		//LinkedHashSet<ParamConfiguration> paramList = (LinkedHashSet<ParamConfiguration>) surrogateZip.getObject(ZipFileName.PARAMS_OBJECTS);
-		//for (ParamConfiguration paramConfiguration : paramList) {
-		//	paramConfiguration.toValueArray();
-		//}
-		
-		
-		
-		//=== Get the number of instance features.
-		Iterator iterator = instanceList.iterator(); 
-		ProblemInstance problemInstance = (ProblemInstance) iterator.next();
-		int numFeatures = problemInstance.getFeaturesDouble().length;
-
-		//=== Get the features X and preprocess the random forest with them.
-		double[][] X = new double[instanceList.size()][numFeatures];
-		int count = 0;	
-		for (ProblemInstance instance: instanceList){
-			X[count++] = instance.getFeaturesDouble();
-		}
-		forest = RandomForest.preprocessForest(forest, X);
-				 * 
-				 */
 				if(fanovaOpts.mode.equals("ipc")) {
 					FunctionalANOVAVarianceDecompose favd = new FunctionalANOVAVarianceDecompose(famb.getRandomForest(), rh.getAlgorithmRunsExcludingRedundant(), configSpace,pool.getRandom("FANOVA_BUILDER"), compareToDef, quantile, fanovaOpts.rfOptions.logModel);
 					
 					FanovaRemote remote = new FanovaRemote(favd, new IPCMechanism("localhost", fanovaOpts.port), configSpace);
 					remote.run();
 				} else {
-					//run command line version of fanova
+					//=== Run command line version of fanova
 					FunctionalANOVARunner.decomposeVariance(famb.getRandomForest(), rh.getAlgorithmRunsExcludingRedundant(), configSpace,pool.getRandom("FANOVA_BUILDER"), compareToDef, quantile, fanovaOpts.computePairwiseInteration, outputDir,fanovaOpts.rfOptions.logModel, fanovaOpts.plotMarginals);
 				}
 				
-
-//				List<AlgorithmRun> algorithmRuns = new ArrayList<AlgorithmRun>();
-//				List<String> names = new ArrayList<String>();
-//				names.add("X0");
-//				names.add("X1");
-//				
-//				RandomForest rf = famb.getRandomForest();
-//				double[][] X = new double[1][0];
-//				rf = RandomForest.preprocessForest(rf, X);
-//				
-				//FunctionalANOVARunnerFromCSV.decomposeVariance(rf, names, pool.getRandom("FANOVA_BUILDER"), false, 0, fanovaOpts.computePairwiseInteration, outputDir,fanovaOpts.rfOptions.logModel, fanovaOpts.plotMarginals);
 
 			} finally {
 				if(pool != null) {

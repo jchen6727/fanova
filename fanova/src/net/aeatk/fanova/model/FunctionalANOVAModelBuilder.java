@@ -1,4 +1,4 @@
-package net.aclib.fanova.model;
+package net.aeatk.fanova.model;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -145,11 +145,21 @@ public class FunctionalANOVAModelBuilder {
 		for(int j=0; j < runResponseValues.length; j++)
 		{ //=== Not sure if I Should be penalizing runs prior to the model
 			// but matlab sure does
-			if(runResponseValues[j] >= scenarioOptions.algoExecOptions.cutoffTime)
-			{	
-				runResponseValues[j] = scenarioOptions.algoExecOptions.cutoffTime * scenarioOptions.intraInstanceObj.getPenaltyFactor();
+
+			switch(scenarioOptions.getRunObjective())
+			{
+			case RUNTIME:
+				if(runResponseValues[j] >= scenarioOptions.algoExecOptions.cutoffTime)
+				{	
+					runResponseValues[j] = scenarioOptions.algoExecOptions.cutoffTime * scenarioOptions.getIntraInstanceObjective().getPenaltyFactor();
+				}
+				break;
+			case QUALITY:
+				
+				break;
+			default:
+				throw new IllegalArgumentException("Not sure what objective this is: " + scenarioOptions.getRunObjective());
 			}
-			
 		}
 	
 		//=== Sanitize the data.

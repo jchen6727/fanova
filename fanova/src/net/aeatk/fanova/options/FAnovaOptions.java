@@ -1,4 +1,4 @@
-package net.aclib.fanova.options;
+package net.aeatk.fanova.options;
 
 import java.io.File;
 import java.util.Collection;

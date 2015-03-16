@@ -1,4 +1,4 @@
-package net.aclib.fanova.model;
+package net.aeatk.fanova.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

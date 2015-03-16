@@ -1,17 +1,15 @@
-package net.aclib.fanova;
+package net.aeatk.fanova;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import java.util.Vector;
-
 
 import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.NormalizedRange;
 import ca.ubc.cs.beta.aeatk.parameterconfigurationspace.ParameterConfigurationSpace;
-import net.aclib.fanova.model.FunctionalANOVAVarianceDecompose;
+import net.aeatk.fanova.model.FunctionalANOVAVarianceDecompose;
 
 public class FanovaRemote {
 	

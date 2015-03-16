@@ -1,4 +1,4 @@
-package net.aclib.fanova.options;
+package net.aeatk.fanova.options;
 
 import ca.ubc.cs.beta.aeatk.misc.options.NoArgumentHandler;
 

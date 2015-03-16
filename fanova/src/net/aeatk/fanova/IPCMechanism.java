@@ -1,4 +1,4 @@
-package net.aclib.fanova;
+package net.aeatk.fanova;
 
 import java.io.BufferedReader;
 import java.io.IOException;

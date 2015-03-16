@@ -289,7 +289,7 @@ class Fanova(object):
             self._heap_size,
             "-cp",
             ":".join(self._fanova_classpath()),
-            "net.aclib.fanova.FAnovaExecutor",
+            "net.aeatk.fanova.FAnovaExecutor",
             "--restoreScenario", self._scenario_dir,
             "--seed", str(self._seed),
             "--rf-num-trees", str(self._num_trees),
