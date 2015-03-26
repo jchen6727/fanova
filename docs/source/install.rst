@@ -16,9 +16,6 @@ Fanova requires:
 `matplotlib <http://matplotlib.org/>`_ (Version 1.4.2)
 
 
-TODO: Add all references here and how to install pyfanova over pip
-
-
 Manually
 ------------
 
