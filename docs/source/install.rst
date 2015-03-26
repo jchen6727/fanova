@@ -1,7 +1,6 @@
 Installation
 ============
 
-
 .. role:: bash(code)
     :language: bash
 

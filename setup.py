@@ -44,7 +44,7 @@ check_java_version()
 
 setup(
     name = "pyfanova",
-    version = "0.1",
+    version = "1.0",
     packages = find_packages(),
     install_requires = ['numpy', 'docutils>=0.3', 'setuptools', 'matplotlib>=1.4.2'],
     author = "Tobias Domhan, Aaron Klein (python wrapper). Frank Hutter (FANOVA)",

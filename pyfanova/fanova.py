@@ -30,7 +30,7 @@ check_java_version()
 
 class Fanova(object):
 
-    def __init__(self, scenario_dir, num_trees=30,
+    def __init__(self, smac_output, num_trees=30,
                  split_min=1,
                  seed=42,
                  improvement_over="NOTHING",
@@ -43,7 +43,7 @@ class Fanova(object):
             Starts the Fanova from the scenario directory and opens a TCP connection to communicate with Java
             
             Arguments:
-              scenario_dir (str): Path to the scenario directory
+              smac_output (str): Path to the state_run directory created by SMAC
               num_trees (int): Number of trees to create the Random Forest
               split_min (int): Minimum number of points to create a new split in the Random Forest
               heap_size (int): Head size in MB for Java
@@ -51,6 +51,8 @@ class Fanova(object):
         """
         
         self._remote = FanovaRemote()
+
+        self.check_output_dir(smac_output)
 
         if fanova_lib_folder is None:
             self._fanova_lib_folder = resource_filename("pyfanova", 'fanova')
@@ -60,7 +62,7 @@ class Fanova(object):
         self._num_trees = num_trees
         self._split_min = split_min
         self._seed = seed
-        self._scenario_dir = scenario_dir
+        self._smac_output = smac_output
         self._heap_size = "-Xmx" + str(heap_size) + "m"
         self._improvement_over = improvement_over
 
@@ -84,6 +86,10 @@ class Fanova(object):
         if self._remote.connected:
             self._remote.send("die")
             self._remote.disconnect()
+
+    def check_output_dir(self, path):
+        #if len(glob.glob(os.path.join(p,"*.pcs"))) == 0 or glob.glob(os.path.join(p,"*.pcs"))
+        pass 
 
     def get_marginal(self, param):
         """
@@ -290,7 +296,7 @@ class Fanova(object):
             "-cp",
             ":".join(self._fanova_classpath()),
             "net.aeatk.fanova.FAnovaExecutor",
-            "--restoreScenario", self._scenario_dir,
+            "--restoreScenario", self._smac_output,
             "--seed", str(self._seed),
             "--rf-num-trees", str(self._num_trees),
             "--split-min", str(self._split_min),

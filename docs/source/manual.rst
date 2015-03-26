@@ -1,6 +1,11 @@
 Manual
 ======
 
+
+.. role:: bash(code)
+    :language: bash
+
+
 Quick Start
 -----------
 To run the examples, just download the `data <fanova/example/online_lda.tar.gz>`_ and start the python console.
@@ -87,9 +92,6 @@ At last, all plots can be created together and stored in a directory with
 
     >>> vis.create_all_plots("./plots/")
 
-TODO:
-plot_categorical_marginal
-
 
 Start Fanova from CSV-file
 --------------------------
@@ -109,11 +111,23 @@ Please make sure, that your csv file has the form
     ====  ==== ==== ====
 
 Start Fanova from HPOlib
---------------------------
+------------------------
 
-It is also possible to run Fanova on data colleted by `HPOlib <https://github.com/automl/HPOlib>`_
+It is also possible to run Fanova on data collected by `HPOlib <https://github.com/automl/HPOlib>`_
 
     >>> from pyfanova.fanova_from_hpolib import FanovaFromHPOLib
     >>> f = FanovaFromHPOLib("params.pcs",["data.pkl"])
 
 
+Fanova on merged SMAC runs
+--------------------------
+
+If you different SMAC runs on the same task and you can combine them and apply Fanova on the merged data set. This will make the result of Fanova more robout simply
+because it has more data.
+
+To merge different SMAC runs, you have to merge the different state-run order via SMAC's state-merge tool:
+	
+	:bash: /path_to_smac/util/state-merge --directories /path/state-run* --scenario-file scenario.txt --outdir merged_state_runs/
+
+	
+Afterwards you can start the Fanova with the path to the new state run directory (e.g. "merged_state_runs/") and it will use the merged data points.
