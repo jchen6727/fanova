@@ -122,7 +122,7 @@ It is also possible to run Fanova on data collected by `HPOlib <https://github.c
 Fanova on merged SMAC runs
 --------------------------
 
-If you different SMAC runs on the same task and you can combine them and apply Fanova on the merged data set. This will make the result of Fanova more robout simply
+If you have different SMAC runs from the same task, you can combine them and apply Fanova on the merged data set. This will make the result of Fanova more reliable, simply
 because it has more data.
 
 To merge different SMAC runs, you have to merge the different state-run order via SMAC's state-merge tool:
