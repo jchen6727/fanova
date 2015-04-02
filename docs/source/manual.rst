@@ -1,10 +1,8 @@
 Manual
 ======
 
-
 .. role:: bash(code)
     :language: bash
-
 
 Quick Start
 -----------
@@ -127,7 +125,7 @@ because it has more data.
 
 To merge different SMAC runs, you have to merge the different state-run order via SMAC's state-merge tool:
 	
-	:bash: /path_to_smac/util/state-merge --directories /path/state-run* --scenario-file scenario.txt --outdir merged_state_runs/
+	:bash:`/path_to_smac/util/state-merge --directories /path/state-run* --scenario-file scenario.txt --outdir merged_state_runs/`
 
 	
 Afterwards you can start the Fanova with the path to the new state run directory (e.g. "merged_state_runs/") and it will use the merged data points.
