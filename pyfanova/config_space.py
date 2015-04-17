@@ -40,7 +40,7 @@ class ConfigSpace(object):
             names = result.split(';')
         else:
             names = []
-            logging.error("No categorical parameters found")
+            logging.error("No continous parameters found")
         return names
 
     def get_integer_parameters(self):
@@ -50,7 +50,7 @@ class ConfigSpace(object):
             names = result.split(';')
         else:
             names = []
-            logging.error("No categorical parameters found")
+            logging.error("No integer parameters found")
         return names
 
     def get_categorical_size(self, parameter):
@@ -82,7 +82,8 @@ class ConfigSpace(object):
 
         self._remote.send_command(["unormalize_value", str(parameter), str(value)])
         value = self._remote.receive()
-        if value != "":
+        if value != "\n":
+
             return float(value)
         else:
             logging.error("Parameter not found")

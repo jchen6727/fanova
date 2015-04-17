@@ -69,15 +69,26 @@ class Visualizer(object):
             plt.savefig(outfile_name)
 
     def plot_categorical_marginal(self, param):
-        categorical_size = self._fanova.get_config_space().get_categorical_size(param)
+        if isinstance(param, int):
+            dim = param
+            param_name = self._fanova.get_config_space().get_parameter_names()[dim]
+        else:
+            if param not in self._fanova.param_name2dmin:
+                print "Parameter %s not known" % param
+                return
+            dim = self._fanova.param_name2dmin[param]
+            param_name = param
+
+        categorical_size = self._fanova.get_config_space().get_categorical_size(param_name)
 
         labels = self._fanova.get_config_space().get_categorical_values(param)
-        logging.debug("LABELS:")
-        logging.debug(labels)
+        
+        if param_name not in self._fanova.get_config_space().get_categorical_parameters():
+            print "Parameter %s is not a categorical parameter!" % (param_name)
 
         indices = np.asarray(range(categorical_size))
         width = 0.5
-        marginals = [self._fanova.get_categorical_marginal_for_value(param, i) for i in range(categorical_size)]
+        marginals = [self._fanova.get_categorical_marginal_for_value(param_name, i) for i in range(categorical_size)]
         mean, std = zip(*marginals)
         plt.bar(indices, mean, width, color='red', yerr=std)
         plt.xticks(indices + width / 2.0, labels)
@@ -137,6 +148,9 @@ class Visualizer(object):
                 return
             dim = self._fanova.param_name2dmin[param]
             param_name = param
+
+        if param_name not in self._fanova.get_config_space().get_integer_parameters() or param_name not in self._fanova.get_config_space().get_continous_parameters():
+            print "Parameter %s is not a continous or numerical parameter!" % (param_name) 
 
         grid = np.linspace(lower_bound, upper_bound, resolution)
         display_grid = [self._fanova.get_config_space().unormalize_value(param_name, value) for value in grid]

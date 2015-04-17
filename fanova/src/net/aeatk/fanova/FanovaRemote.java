@@ -62,10 +62,13 @@ public class FanovaRemote {
 				assert commandAndArgs.length == 3;
 				String parameterName = commandAndArgs[1];
 				double normalizedValue = Double.valueOf(commandAndArgs[2]);
+				
 				if (this.configSpace.getNormalizedRangeMap().containsKey(parameterName))
 				{
+					
 					NormalizedRange range = this.configSpace.getNormalizedRangeMap().get(parameterName);
 					this.ipc.send(range.unnormalizeValue(normalizedValue) + "\n" );
+					
 				}
 				else {
 					this.ipc.send("\n");

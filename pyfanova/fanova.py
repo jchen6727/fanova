@@ -75,7 +75,7 @@ class Fanova(object):
             self.param_name2dmin = dict(zip(param_names, range(len(param_names))))
         else:
             stdout, stderr = self._process.communicate()
-            error_msg = "failed starting fanova "
+            error_msg = "Failed starting fanova. Did you start it from a SMAC state-run directory?"
             if stdout is not None:
                 error_msg += stdout
             if stderr is not None:
