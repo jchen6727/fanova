@@ -151,8 +151,8 @@ class Visualizer(object):
             param_name = param
 
         if param_name not in self._fanova.get_config_space().get_integer_parameters() or param_name not in self._fanova.get_config_space().get_continuous_parameters():
-            print "Parameter %s is not a continous or numerical parameter!" % (param_name) 
-
+            print "Parameter %s is not a continuous or integer parameter!" % (param_name) 
+            return 
         grid = np.linspace(lower_bound, upper_bound, resolution)
         display_grid = [self._fanova.get_config_space().unormalize_value(param_name, value) for value in grid]
 
