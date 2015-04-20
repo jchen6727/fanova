@@ -93,6 +93,7 @@ class Visualizer(object):
         plt.bar(indices, mean, width, color='red', yerr=std)
         plt.xticks(indices + width / 2.0, labels)
         plt.ylabel("Performance")
+        plt.xlabel(param_name)
 
         return plt
 
@@ -149,7 +150,7 @@ class Visualizer(object):
             dim = self._fanova.param_name2dmin[param]
             param_name = param
 
-        if param_name not in self._fanova.get_config_space().get_integer_parameters() or param_name not in self._fanova.get_config_space().get_continous_parameters():
+        if param_name not in self._fanova.get_config_space().get_integer_parameters() or param_name not in self._fanova.get_config_space().get_continuous_parameters():
             print "Parameter %s is not a continous or numerical parameter!" % (param_name) 
 
         grid = np.linspace(lower_bound, upper_bound, resolution)
