@@ -150,7 +150,7 @@ class Visualizer(object):
             dim = self._fanova.param_name2dmin[param]
             param_name = param
 
-        if param_name not in self._fanova.get_config_space().get_integer_parameters() or param_name not in self._fanova.get_config_space().get_continuous_parameters():
+        if param_name not in self._fanova.get_config_space().get_integer_parameters() and param_name not in self._fanova.get_config_space().get_continuous_parameters():
             print "Parameter %s is not a continuous or integer parameter!" % (param_name) 
             return 
         grid = np.linspace(lower_bound, upper_bound, resolution)
