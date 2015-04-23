@@ -31,9 +31,10 @@ check_java_version()
 class Fanova(object):
 
     def __init__(self, smac_output, num_trees=30,
-                 split_min=1,
+                 split_min=5,
                  seed=42,
                  improvement_over="NOTHING",
+                 quantile_to_compare=0.25,
                  heap_size=1024,
                  fanova_lib_folder=None,
                  fanova_class_folder=None):
@@ -48,6 +49,7 @@ class Fanova(object):
               split_min (int): Minimum number of points to create a new split in the Random Forest
               heap_size (int): Head size in MB for Java
               improvement_over [DEFAULT, QUANTILE, NOTHING]: Compute improvements with respect to (this setting)
+              quantile_to_compare (float): Quantile to compare to (if using QUANTILE --improvements-over)
         """
         
         self._remote = FanovaRemote()
@@ -65,6 +67,7 @@ class Fanova(object):
         self._smac_output = smac_output
         self._heap_size = "-Xmx" + str(heap_size) + "m"
         self._improvement_over = improvement_over
+        self._quantile_to_compare = quantile_to_compare
 
         self._start_fanova()
         logging.debug("Now connecting to fanova...")
@@ -301,7 +304,8 @@ class Fanova(object):
             "--rf-num-trees", str(self._num_trees),
             "--split-min", str(self._split_min),
             "--ipc-port", str(self._remote.port),
-            "--improvements-over", self._improvement_over
+            "--improvements-over", self._improvement_over,
+            "--quantile-to-compare", str(self._quantile_to_compare)
             ]
         #TODO: check that fanova was started successfully and wasn't killed
         with open(os.devnull, "w") as fnull:

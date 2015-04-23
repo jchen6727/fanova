@@ -31,6 +31,22 @@ If you want to print all marginal at once, you can do that by:
 But be aware of that may take a while!
 
 
+Advanced
+--------
+
+If you want to take only configurations into account that achieved a better performance than the default configuration you have to set the flag 'improvement_over="DEFAULT"'
+when you call the Fanova like:
+
+    >>> f = Fanova("example/online_lda", improvement_over="DEFAULT")
+
+Furthermore, if you want the Fanova only a certain quantile (let's say 25%) of the data you can call it by:
+
+	>>> f = Fanova("example/online_lda", improvement_over="QUANTILE", quantile_to_compare=0.25)
+
+You can also specify the number of trees in the random forest as well as the minimum number of points to make a new split in a tree by:
+
+	>>> f = Fanova("example/online_lda", num_trees=30, split_min=3)
+
 More functions
 --------------
 
