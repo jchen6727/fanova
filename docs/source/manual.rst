@@ -88,6 +88,8 @@ what should look like this
 
 .. image:: https://raw.githubusercontent.com/aaronkl/fanova/master/fanova/example/online_lda/Col1.png
 
+NOTE: For categorical values use the function plot_categorical_marginal() instead.
+
 The same can been done for pairwise marginals
 
     >>> vis.plot_pairwise_marginal("Col0", "Col2")
