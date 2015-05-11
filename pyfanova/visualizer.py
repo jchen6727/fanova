@@ -139,7 +139,7 @@ class Visualizer(object):
         fig.colorbar(surface, shrink=0.5, aspect=5)
         return plt
 
-    def plot_marginal(self, param, lower_bound=0, upper_bound=1, is_int=False, resolution=100):
+    def plot_marginal(self, param, lower_bound=0, upper_bound=1, is_int=False, resolution=100, log_scale=False):
         if isinstance(param, int):
             dim = param
             param_name = self._fanova.get_config_space().get_parameter_names()[dim]
@@ -168,10 +168,10 @@ class Visualizer(object):
         lower_curve = mean - std
         upper_curve = mean + std
 
-        if np.diff(display_grid).std() > 0.000001 and param_name in self._fanova.get_config_space().get_continuous_parameters():
+        if log_scale or (np.diff(display_grid).std() > 0.000001 and param_name in self._fanova.get_config_space().get_continuous_parameters()):
             #HACK for detecting whether it's a log parameter, because the config space doesn't expose this information
             plt.semilogx(display_grid, mean, 'b')
-            print "printing %s semilogx" % param_name
+            #print "printing %s semilogx" % param_name
         else:
             plt.plot(display_grid, mean, 'b')
         plt.fill_between(display_grid, upper_curve, lower_curve, facecolor='red', alpha=0.6)
