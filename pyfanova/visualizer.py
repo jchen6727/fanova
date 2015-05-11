@@ -90,8 +90,24 @@ class Visualizer(object):
         width = 0.5
         marginals = [self._fanova.get_categorical_marginal_for_value(param_name, i) for i in range(categorical_size)]
         mean, std = zip(*marginals)
-        plt.bar(indices, mean, width, color='red', yerr=std)
-        plt.xticks(indices + width / 2.0, labels)
+        #plt.bar(indices, mean, width, color='red', yerr=std)
+        #plot mean
+        b = plt.boxplot(map(lambda x: [x], mean), 0, '', labels=labels)
+        min_y = mean[0]
+        max_y = mean[0]
+        # blow up boxes 
+        for box, std_ in zip(b["boxes"], std):
+            y = box.get_ydata()
+            y[2:4] = y[2:4] + std_
+            y[0:2] = y[0:2] - std_
+            y[4] = y[4] - std_
+            box.set_ydata(y)
+            min_y = min(min_y, y[0] - std_)
+            max_y = max(max_y, y[2] + std_)
+        
+        plt.ylim([min_y, max_y])
+        
+        #plt.xticks(indices, labels)
         plt.ylabel("Performance")
         plt.xlabel(param_name)
 
