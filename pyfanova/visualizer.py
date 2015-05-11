@@ -11,11 +11,11 @@ class Visualizer(object):
     def __init__(self, fanova):
         self._fanova = fanova
         self._latex_template = '''\documentclass[letterpaper]{article}
-\usepackage{times}
-\usepackage{graphicx}
-\usepackage{epsfig}
-\usepackage{subfigure}
-\usepackage{lscape}
+\\usepackage{times}
+\\usepackage{graphicx}
+\\usepackage{epsfig}
+\\usepackage{subfigure}
+\\usepackage{lscape}
 \begin{document}
 \title{Functional ANOVA Analysis}
 \maketitle
@@ -39,7 +39,7 @@ class Visualizer(object):
         for param_name in self._fanova.get_config_space().get_categorical_parameters():
             plt.clf()
             outfile_name = os.path.join(directory, param_name.replace(os.sep, "_") + ".png")
-            print "creating %s" % outfile_name
+            print("creating %s" % outfile_name)
             self.plot_categorical_marginal(param_name)
             plt.savefig(outfile_name)
 
@@ -50,7 +50,7 @@ class Visualizer(object):
         for param_name in params_to_plot:
             plt.clf()
             outfile_name = os.path.join(directory, param_name.replace(os.sep, "_") + ".png")
-            print "creating %s" % outfile_name
+            print("creating %s" % outfile_name)
             self.plot_marginal(param_name, **kwargs)
             plt.savefig(outfile_name)
 
@@ -60,11 +60,11 @@ class Visualizer(object):
         most_important_pairwise_marginals = self._fanova.get_most_important_pairwise_marginals(n)
         for param1, param2 in most_important_pairwise_marginals:
             if param1 in categorical_parameters or param2 in categorical_parameters:
-                print "skipping pairwise marginal plot %s x %s, because one of them is categorical" % (param1, param2)
+                print("skipping pairwise marginal plot %s x %s, because one of them is categorical" % (param1, param2))
                 continue
             outfile_name = os.path.join(directory, param1.replace(os.sep, "_") + "x" + param2.replace(os.sep, "_") + ".png")
             plt.clf()
-            print "creating %s" % outfile_name
+            print("creating %s" % outfile_name)
             self.plot_pairwise_marginal(param1, param2)
             plt.savefig(outfile_name)
 
@@ -74,7 +74,7 @@ class Visualizer(object):
             param_name = self._fanova.get_config_space().get_parameter_names()[dim]
         else:
             if param not in self._fanova.param_name2dmin:
-                print "Parameter %s not known" % param
+                print("Parameter %s not known" % param)
                 return
             dim = self._fanova.param_name2dmin[param]
             param_name = param
@@ -84,15 +84,15 @@ class Visualizer(object):
         labels = self._fanova.get_config_space().get_categorical_values(param)
         
         if param_name not in self._fanova.get_config_space().get_categorical_parameters():
-            print "Parameter %s is not a categorical parameter!" % (param_name)
+            print("Parameter %s is not a categorical parameter!" % (param_name))
 
-        indices = np.asarray(range(categorical_size))
+        indices = np.asarray(list(range(categorical_size)))
         width = 0.5
         marginals = [self._fanova.get_categorical_marginal_for_value(param_name, i) for i in range(categorical_size)]
-        mean, std = zip(*marginals)
+        mean, std = list(zip(*marginals))
         #plt.bar(indices, mean, width, color='red', yerr=std)
         #plot mean
-        b = plt.boxplot(map(lambda x: [x], mean), 0, '', labels=labels)
+        b = plt.boxplot([[x] for x in mean], 0, '', labels=labels)
         min_y = mean[0]
         max_y = mean[0]
         # blow up boxes 
@@ -161,20 +161,20 @@ class Visualizer(object):
             param_name = self._fanova.get_config_space().get_parameter_names()[dim]
         else:
             if param not in self._fanova.param_name2dmin:
-                print "Parameter %s not known" % param
+                print("Parameter %s not known" % param)
                 return
             dim = self._fanova.param_name2dmin[param]
             param_name = param
 
         if param_name not in self._fanova.get_config_space().get_integer_parameters() and param_name not in self._fanova.get_config_space().get_continuous_parameters():
-            print "Parameter %s is not a continuous or integer parameter!" % (param_name) 
+            print("Parameter %s is not a continuous or integer parameter!" % (param_name)) 
             return 
         grid = np.linspace(lower_bound, upper_bound, resolution)
         display_grid = [self._fanova.get_config_space().unormalize_value(param_name, value) for value in grid]
 
         mean = np.zeros(resolution)
         std = np.zeros(resolution)
-        for i in xrange(0, resolution):
+        for i in range(0, resolution):
             (m, s) = self._fanova.get_marginal_for_value(dim, grid[i])
             mean[i] = m
             std[i] = s

@@ -60,7 +60,7 @@ class FanovaFromCSV(Fanova):
         writer.writerow(("Run Number", "Run History Configuration ID", "Instance ID", "Response Value (y)", "Censored?", "Cutoff Time Used",
                                       "Seed", "Runtime", "Run Length", "Run Result Code", "Run Quality", "SMAC Iteration", "SMAC Cumulative Runtime", "Run Result"))
 
-        for i in xrange(0, len(values)):
+        for i in range(0, len(values)):
             line = (i, i, 1, 0, 0, 0, 1, 0, 0, 0, values[i], 0, 0, "SAT")
             writer.writerow(line)
 
@@ -69,7 +69,7 @@ class FanovaFromCSV(Fanova):
     def _write_param_file(self):
 
         fh = open(os.path.join(self._scenario_dir, "param-file.txt"), "w")
-        for i in xrange(0, self._num_of_params):
+        for i in range(0, self._num_of_params):
             param_string = "X" + str(i) + " " + str(self._bounds[i]) + " " + "[" + str(self._defaults[i]) + "]\n"
             logging.debug(param_string)
             fh.write(param_string)
@@ -79,9 +79,9 @@ class FanovaFromCSV(Fanova):
     def _write_paramstrings_file(self, params):
 
         fh = open(os.path.join(self._scenario_dir, "paramstrings.txt"), "w")
-        for i in xrange(0, params.shape[0]):
+        for i in range(0, params.shape[0]):
             line = str(i) + ": "
-            for j in xrange(0, params.shape[1]):
+            for j in range(0, params.shape[1]):
                 line = line + "X" + str(j) + "='" + str(params[i][j]) + "', "
             #remove the last comma and whitespace from the string again
             line = line[:-2]
@@ -114,7 +114,7 @@ class FanovaFromCSV(Fanova):
         fh.seek(0)
         rownum = 0
         for line in reader:
-            for param in xrange(0, self._num_of_params):
+            for param in range(0, self._num_of_params):
                 X[rownum][param] = line[param]
             y[rownum] = line[-1]
             rownum += 1
@@ -123,7 +123,7 @@ class FanovaFromCSV(Fanova):
 
         self._bounds = []
         self._defaults = []
-        for i in xrange(0, self._num_of_params):
+        for i in range(0, self._num_of_params):
             #Take min and max value as bounds for smac parameter file
             self._bounds.append([np.min(X[:, i]), np.max(X[:, i])])
             #Set min value as default value for smac parameter file

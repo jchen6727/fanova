@@ -53,7 +53,7 @@ class FanovaFromHPOLib(Fanova):
 
     def _clean_trials(self):
         trials = []
-        for i in xrange(0, len(self.trials)):
+        for i in range(0, len(self.trials)):
             result = self.trials[i]["result"]
             if not np.isfinite(result):
                 logging.warning("skipping result, that's not finite...")
@@ -93,7 +93,7 @@ class FanovaFromHPOLib(Fanova):
         writer.writerow(("Run Number", "Run History Configuration ID", "Instance ID", "Response Value (y)", "Censored?", "Cutoff Time Used",
                                       "Seed", "Runtime", "Run Length", "Run Result Code", "Run Quality", "SMAC Iteration", "SMAC Cumulative Runtime", "Run Result"))
 
-        for i in xrange(0, len(self.trials)):
+        for i in range(0, len(self.trials)):
             result = self.trials[i]["result"]
             line = (i, i, 1, 0, 0, 0, 1, 0, 0, 0, result, 0, 0, "SAT")
             writer.writerow(line)
@@ -108,15 +108,15 @@ class FanovaFromHPOLib(Fanova):
 
     def _write_paramstrings_file(self):
         fh = open(os.path.join(self._scenario_dir, "paramstrings.txt"), "w")
-        for i in xrange(0, len(self.trials)):
+        for i in range(0, len(self.trials)):
             params = self.trials[i]["params"]
             clean_params = {}
-            for param_name, param_value in params.iteritems():
+            for param_name, param_value in params.items():
                 #FIX of a hpolib bug, where the parameter names in the pkl contain a - infront of their name
                 if param_name[0] == '-':
                     param_name = param_name[1:]
                 clean_params[param_name] = param_value
-            param_list = ["%s='%s'" % (key, value) for key, value in clean_params.iteritems()]
+            param_list = ["%s='%s'" % (key, value) for key, value in clean_params.items()]
             line = "%d: %s\n" % (i, ", ".join(param_list))
             fh.write(line)
         fh.close()
