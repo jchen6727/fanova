@@ -13,11 +13,11 @@ from pyfanova.config_space import ConfigSpace
 def check_java_version():
     import re
     from subprocess import STDOUT, check_output
-    out = check_output(["java", "-version"], stderr=STDOUT).split("\n")
+    out = check_output(["java".encode("utf-8"), "-version".encode("utf-8")], stderr=STDOUT).split("\n".encode("utf-8"))
     if len(out) < 1:
         print("Failed checking Java version. Make sure Java version 7 or greater is installed.")
         return False
-    m = re.match('java version "\d+.(\d+)..*', out[0])
+    m = re.match('java version "\d+.(\d+)..*'.encode("utf-8"), out[0])
     if m is None or len(m.groups()) < 1:
         print("Failed checking Java version. Make sure Java version 7 or greater is installed.")
         return False
