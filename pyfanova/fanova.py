@@ -13,13 +13,13 @@ from pyfanova.config_space import ConfigSpace
 def check_java_version():
     import re
     from subprocess import STDOUT, check_output
-    out = check_output(["java", "-version"], stderr=STDOUT).split("\n")
+    out = check_output(["java".encode("utf-8"), "-version".encode("utf-8")], stderr=STDOUT).split("\n".encode("utf-8"))
     if len(out) < 1:
-        print "Failed checking Java version. Make sure Java version 7 or greater is installed."
+        print("Failed checking Java version. Make sure Java version 7 or greater is installed.")
         return False
-    m = re.match('java version "\d+.(\d+)..*', out[0])
+    m = re.match('java version "\d+.(\d+)..*'.encode("utf-8"), out[0])
     if m is None or len(m.groups()) < 1:
-        print "Failed checking Java version. Make sure Java version 7 or greater is installed."
+        print("Failed checking Java version. Make sure Java version 7 or greater is installed.")
         return False
     java_version = int(m.group(1))
     if java_version < 7:
@@ -75,7 +75,7 @@ class Fanova(object):
             self._config_space = ConfigSpace(self._remote)
 
             param_names = self._config_space.get_parameter_names()
-            self.param_name2dmin = dict(zip(param_names, range(len(param_names))))
+            self.param_name2dmin = dict(list(zip(param_names, list(range(len(param_names))))))
         else:
             stdout, stderr = self._process.communicate()
             error_msg = "Failed starting fanova. Did you start it from a SMAC state-run directory?"
@@ -179,7 +179,7 @@ class Fanova(object):
         """
         size = self._config_space.get_categorical_size(param)
         if(value >= size):
-            print "Categorical value %d is out of bounds [%d, %d] for parameter %s" %(value, 0, size, param)
+            print("Categorical value %d is out of bounds [%d, %d] for parameter %s" %(value, 0, size, param))
             return
         else:
             return self._get_marginal_for_value(param, value)
@@ -272,7 +272,7 @@ class Fanova(object):
         for marginal, param_name in zip(main_marginal_performances, param_names):
             labelled_performances.append((marginal, "%.2f%% due to main effect: %s" % (marginal, param_name), param_name))
 
-        print "Sum of fractions for main effects %.2f%%" % (sum(main_marginal_performances))
+        print("Sum of fractions for main effects %.2f%%" % (sum(main_marginal_performances)))
 
         if pairwise:
             pairwise_marginal_performance = self.get_all_pairwise_marginals()
@@ -282,14 +282,14 @@ class Fanova(object):
                     label = "%.2f%% due to interaction: %s x %s" % (pairwise_marginal_performance, param_name1, param_name2)
                     labelled_performances.append((pairwise_marginal_performance, label, param_name1 + " x " + param_name2))
 
-            print "Sum of fractions for pairwise interaction effects %.2f%%" % (sum_of_pairwise_marginals)
+            print("Sum of fractions for pairwise interaction effects %.2f%%" % (sum_of_pairwise_marginals))
 
         sorted_performances = sorted(labelled_performances, reverse=True)
         return_values = []
         if max_num is not None:
             sorted_performances = sorted_performances[:max_num]
         for marginal, label, name in sorted_performances:
-            print label
+            print(label)
             return_values.append((marginal, name))
         return return_values
 
