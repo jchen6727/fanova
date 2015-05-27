@@ -34,7 +34,7 @@ def check_java_exists():
         error_msg = """
         Java not found!
 
-        pysmac needs java in order to work. You can download java from:
+        Fanova needs java in order to work. You can download java from:
         http://java.com/getjava
         """
         raise RuntimeError(error_msg)
@@ -46,7 +46,15 @@ setup(
     name = "pyfanova",
     version = "1.0",
     packages = find_packages(),
-    install_requires = ['numpy', 'docutils>=0.3', 'setuptools', 'matplotlib>=1.4.2'],
+    install_requires = [
+                        'numpy',
+                        'docutils>=0.3',
+                        'setuptools',
+                        'matplotlib>=1.4.2',
+                        'ParameterConfigSpace'],
+
+    dependency_links=['https://github.com/automl/ParameterConfigSpace/archive/master.zip'],
+
     author = "Tobias Domhan, Aaron Klein (python wrapper). Frank Hutter (FANOVA)",
     author_email = "kleinaa@cs.uni-freiburg.de",
     description = "Functional ANOVA: an implementation of the ICML 2014 paper 'An Efficient Approach for Assessing Hyperparameter Importance' by Frank Hutter, Holger Hoos and Kevin Leyton-Brown.",

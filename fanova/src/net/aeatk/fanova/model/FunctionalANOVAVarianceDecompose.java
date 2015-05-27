@@ -28,7 +28,8 @@ public class FunctionalANOVAVarianceDecompose {
 	private Vector <HashMap<Integer,Double>> singleVarianceContributions;
 	private HashMap<HashSet<Integer>,Double> thisTreeVarianceContributions = new HashMap<HashSet<Integer>,Double>(); 
 	private HashMap<HashSet<Integer>,Double> totalFractionsExplained = new HashMap<HashSet<Integer>,Double>();
-
+	private int numTreesWithPositiveVariance;
+	
 	public FunctionalANOVAVarianceDecompose(RandomForest existingForest, List<AlgorithmRunResult> testRuns,
 			ParameterConfigurationSpace configSpace, Random rand, 
 			boolean compareToDef, double quantileToCompareTo, boolean logModel) throws IOException, InterruptedException 
@@ -42,11 +43,13 @@ public class FunctionalANOVAVarianceDecompose {
 	
 		//=== Initialize variables to be incrementally updated.
 		String s;
-
+				
+		
 		int numDim = configSpace.getCategoricalSize().length;
 		allObservations = new double[forest.Trees.length][numDim][];
 		allIntervalSizes = new double[forest.Trees.length][numDim][];
 		thisTreeTotalVariance = new double[forest.Trees.length];
+		this.numTreesWithPositiveVariance = 0;
 		//=== Loop over trees.
 		for(int numTree=0; numTree<forest.Trees.length; numTree++){
 			HashSet<Integer> allVariableIndices = new HashSet<Integer>();
@@ -60,6 +63,9 @@ public class FunctionalANOVAVarianceDecompose {
 				s = "Tree " + numTree + " has no variance -> skipping.";
 				log.info(s);
 				continue;
+			}
+			else{
+				this.numTreesWithPositiveVariance++;
 			}
 			s = "Tree " + numTree + ": Total variance of predictor: " + thisTreeTotalVariance[numTree];
 			log.info(s);
@@ -130,6 +136,10 @@ public class FunctionalANOVAVarianceDecompose {
 					
 		for(int numTree=0; numTree<forest.Trees.length; numTree++){
 
+			if (thisTreeTotalVariance[numTree] == 0.0){
+				continue;
+			}
+			
 			int[] indicesOfObservations = new int[1];
 			//=== Compute marginal predictions for each instantiation of this categorical parameter.
 			indicesOfObservations[0] = dim;
@@ -170,7 +180,7 @@ public class FunctionalANOVAVarianceDecompose {
 				previousFractionExplained = totalFractionsExplained.get(set);
 			}
 			double thisFractionExplained = thisTreeVarianceContributions.get(set)/thisTreeTotalVariance[numTree]*100;
-			totalFractionsExplained.put(set, previousFractionExplained + 1.0/forest.Trees.length * thisFractionExplained);
+			totalFractionsExplained.put(set, previousFractionExplained + 1.0/this.numTreesWithPositiveVariance* thisFractionExplained);
 		}
 		return totalFractionsExplained.get(set);
 	}
@@ -193,6 +203,10 @@ public class FunctionalANOVAVarianceDecompose {
 		
 		for(int numTree=0; numTree<forest.Trees.length; numTree++){
 
+			if (thisTreeTotalVariance[numTree] == 0.0){
+				continue;
+			}
+			
 			int[] indicesOfObservations = new int[2];
 			indicesOfObservations[0] = dim1;
 			ArrayList<Double> as = new ArrayList<Double>();
@@ -234,7 +248,7 @@ public class FunctionalANOVAVarianceDecompose {
 				previousFractionExplained = totalFractionsExplained.get(set);
 			}
 			double thisFractionExplained = thisTreeVarianceContributions.get(set)/thisTreeTotalVariance[numTree]*100;
-			totalFractionsExplained.put(set, previousFractionExplained + 1.0/forest.Trees.length * thisFractionExplained);
+			totalFractionsExplained.put(set, previousFractionExplained + 1.0/this.numTreesWithPositiveVariance * thisFractionExplained);
 			
 		}
 		return totalFractionsExplained.get(set);
