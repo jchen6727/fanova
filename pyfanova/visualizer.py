@@ -1,33 +1,14 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
-import os
-import logging
 
 
 class Visualizer(object):
 
     def __init__(self, fanova):
         self._fanova = fanova
-        self._latex_template = '''\documentclass[letterpaper]{article}
-\\usepackage{times}
-\\usepackage{graphicx}
-\\usepackage{epsfig}
-\\usepackage{subfigure}
-\\usepackage{lscape}
-\begin{document}
-\title{Functional ANOVA Analysis}
-\maketitle
-\textbf{When using parts of this document, please cite the functional ANOVA paper (the reference will be available soon; in the meantime please ask Frank for details).}
-%begin{figure}[tbp]\\
-%begin{center}\\
-%includegraphics{" + singleMarginalOutputFile + "}\\
-%caption{Marginal predictions for parameter " + parameterName.replace("_", "\\_") + ". This marginal explains " + decim2.format(fractionExplainedByThisMarginal) + "\\% of the predictor's total variance. 
-%label{fig:" + parameterName + "}}\\
-%end{center}\\
-%end{figure}\\
-\end{document}'''
 
     def create_all_plots(self, directory, **kwargs):
         """
@@ -139,8 +120,8 @@ class Visualizer(object):
 
         zz = np.reshape(zz, [resolution, resolution])
 
-        display_grid_1 = [self._fanova.get_config_space().unormalize_value(param_name_1, value) for value in grid_1]
-        display_grid_2 = [self._fanova.get_config_space().unormalize_value(param_name_2, value) for value in grid_2]
+        display_grid_1 = [self._fanova.unormalize_value(param_name_1, value) for value in grid_1]
+        display_grid_2 = [self._fanova.unormalize_value(param_name_2, value) for value in grid_2]
 
         display_xx, display_yy = np.meshgrid(display_grid_1, display_grid_2)
 
@@ -170,7 +151,7 @@ class Visualizer(object):
             print("Parameter %s is not a continuous or integer parameter!" % (param_name)) 
             return 
         grid = np.linspace(lower_bound, upper_bound, resolution)
-        display_grid = [self._fanova.get_config_space().unormalize_value(param_name, value) for value in grid]
+        display_grid = [self._fanova.unormalize_value(param_name, value) for value in grid]
 
         mean = np.zeros(resolution)
         std = np.zeros(resolution)
