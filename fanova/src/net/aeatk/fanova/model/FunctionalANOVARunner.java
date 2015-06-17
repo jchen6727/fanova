@@ -67,6 +67,17 @@ public class FunctionalANOVARunner {
 		double[][] allObservations = new double[numDim][];
 		double[][] allIntervalSizes = new double[numDim][];
 		
+		//=== Loop over trees to get number of trees with positive variance.
+		double[] treeTotalVariance = new double[forest.Trees.length];
+		int numTreesWithPositiveVariance = 0;
+		for(int numTree=0; numTree<forest.Trees.length; numTree++){
+			double thisTreeTotalVariance = RandomForestPreprocessor.computeTotalVarianceOfRegressionTree(forest.Trees[numTree], configSpace);
+			treeTotalVariance[numTree] = thisTreeTotalVariance;
+			if (thisTreeTotalVariance > 0.0){
+				numTreesWithPositiveVariance++;
+			}
+		}
+		
 		//=== Loop over trees.
 		for(int numTree=0; numTree<forest.Trees.length; numTree++){
 			HashSet<Integer> allVariableIndices = new HashSet<Integer>();
@@ -75,7 +86,7 @@ public class FunctionalANOVARunner {
 			}
 
 			//=== Get the tree's total variance (only works for marginal trees, i.e., in the absence of instance features).
-			double thisTreeTotalVariance = RandomForestPreprocessor.computeTotalVarianceOfRegressionTree(forest.Trees[numTree], configSpace);
+			double thisTreeTotalVariance = treeTotalVariance[numTree]; 
 			if (thisTreeTotalVariance == 0.0){
 				s = "Tree " + numTree + " has no variance -> skipping.";
 				log.info(s);
@@ -271,7 +282,7 @@ public class FunctionalANOVARunner {
 				log.debug("ThisTreeVarianceContributions of index" + indexSet.toString() + " for Tree" + numTree + " : " + thisTreeVarianceContributions.get(indexSet));
 				log.debug("ThisTreeTotalVariance for Tree" + numTree + " : " + thisTreeTotalVariance);
 				tmpThisTreeFractionExplained += thisFractionExplained;
-				totalFractionsExplained.put(indexSet, previousFractionExplained + 1.0/forest.Trees.length * thisFractionExplained);
+				totalFractionsExplained.put(indexSet, previousFractionExplained + 1.0/numTreesWithPositiveVariance * thisFractionExplained);
 				log.debug("TotalFractionExplained for Tree" + numTree + " : " + totalFractionsExplained.get(indexSet));
 
 			}	
