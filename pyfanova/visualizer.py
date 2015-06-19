@@ -52,7 +52,7 @@ class Visualizer(object):
     def plot_categorical_marginal(self, param):
         if isinstance(param, int):
             dim = param
-            param_name = self._fanova.get_config_space().get_parameter_names()[dim]
+            param_name = self._fanova.get_parameter_names()[dim]
         else:
             if param not in self._fanova.param_name2dmin:
                 print("Parameter %s not known" % param)
@@ -97,7 +97,7 @@ class Visualizer(object):
     def _check_param(self, param):
         if isinstance(param, int):
             dim = param
-            param_name = self._fanova.get_config_space().get_parameter_names()[dim]
+            param_name = self._fanova.get_parameter_names()[dim]
         else:
             assert param in self._fanova.param_name2dmin, "param %s not known" % param
             dim = self._fanova.param_name2dmin[param]
@@ -139,7 +139,7 @@ class Visualizer(object):
     def plot_marginal(self, param, lower_bound=0, upper_bound=1, is_int=False, resolution=100, log_scale=False):
         if isinstance(param, int):
             dim = param
-            param_name = self._fanova.get_config_space().get_parameter_names()[dim]
+            param_name = self._fanova.get_parameter_names()[dim]
         else:
             if param not in self._fanova.param_name2dmin:
                 print("Parameter %s not known" % param)
