@@ -74,7 +74,7 @@ class Fanova(object):
         if self._start_connection():
             self._config_space = ConfigSpace(self._remote)
 
-            param_names = self._config_space.get_parameter_names()
+            param_names = self.get_parameter_names()
             self.param_name2dmin = dict(list(zip(param_names, list(range(len(param_names))))))
         else:
             stdout, stderr = self._process.communicate()
@@ -89,6 +89,17 @@ class Fanova(object):
         if self._remote.connected:
             self._remote.send("die")
             self._remote.disconnect()
+
+    def get_parameter_names(self):
+
+        self._remote.send("get_parameter_names")
+        result = self._remote.receive().strip()
+        if len(result) > 0:
+            names = result.split(';')
+        else:
+            names = []
+            logging.error("No parameters found")
+        return names
 
     def check_output_dir(self, path):
         #if len(glob.glob(os.path.join(p,"*.pcs"))) == 0 or glob.glob(os.path.join(p,"*.pcs"))
@@ -225,7 +236,7 @@ class Fanova(object):
             Returns:
               list: pairwise_marginals
         """
-        param_names = self._config_space.get_parameter_names()
+        param_names = self.get_parameter_names()
         pairwise_marginals = []
         for i, param_name1 in enumerate(param_names):
             for j, param_name2 in enumerate(param_names):
@@ -263,7 +274,7 @@ class Fanova(object):
               list: (marginal, name)
         """
 
-        param_names = self._config_space.get_parameter_names()
+        param_names = self.get_parameter_names()
         num_params = len(param_names)
 
         main_marginal_performances = [self.get_marginal(i) for i in range(num_params)]
