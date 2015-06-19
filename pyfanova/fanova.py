@@ -2,13 +2,15 @@ import os
 import logging
 import sys
 import socket
-import numpy
-import subprocess
+import glob
+
 from subprocess import Popen
 from pkg_resources import resource_filename
-from pyfanova.fanova_remote import FanovaRemote
-from pyfanova.config_space import ConfigSpace
 
+from pyfanova.fanova_remote import FanovaRemote
+#from pyfanova.config_space import ConfigSpace
+
+from ParameterConfigSpace.config_space import ConfigSpace
 
 def check_java_version():
     import re
@@ -72,7 +74,16 @@ class Fanova(object):
         self._start_fanova()
         logging.debug("Now connecting to fanova...")
         if self._start_connection():
-            self._config_space = ConfigSpace(self._remote)
+            if len(glob.glob(os.path.join(smac_output,"*.pcs"))) == 1:
+                pcs_file = glob.glob(os.path.join(smac_output,"*.pcs"))[0]
+            elif len(glob.glob(os.path.join(smac_output,"params.txt"))) == 1:
+                pcs_file = glob.glob(os.path.join(smac_output,"params.txt"))[0]
+            elif len(glob.glob(os.path.join(smac_output,"param-file.txt"))) == 1:
+                pcs_file = glob.glob(os.path.join(smac_output,"param-file.txt"))[0]
+            else:
+                print "Error: Couldn't find a parameter configuration space file. Make sure that in the SMAC output directory is a valid file with name *.pcs, params.txt or param-file.txt"
+                return
+            self._config_space = ConfigSpace(pcs_file)
 
             param_names = self.get_parameter_names()
             self.param_name2dmin = dict(list(zip(param_names, list(range(len(param_names))))))
@@ -188,6 +199,7 @@ class Fanova(object):
             Returns:
               double: marginal
         """
+        
         size = self._config_space.get_categorical_size(param)
         if(value >= size):
             print("Categorical value %d is out of bounds [%d, %d] for parameter %s" %(value, 0, size, param))
@@ -350,3 +362,15 @@ class Fanova(object):
             classpath.append(os.path.abspath(self._fanova_class_folder))
         logging.debug(classpath)
         return classpath
+    
+    def unormalize_value(self, parameter, value):
+        assert value <= 1 and value >= 0
+
+        self._remote.send_command(["unormalize_value", str(parameter), str(value)])
+        value = self._remote.receive()
+        if value != "\n":
+
+            return float(value)
+        else:
+            logging.error("Parameter not found")
+            raise ValueError("Parameter not found")
