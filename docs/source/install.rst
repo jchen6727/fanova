@@ -24,6 +24,8 @@ To install fanova from command line type the following commands in your bash ter
 	:bash:`git clone https://github.com/automl/fanova.git`
 
 	:bash:`cd fanova/`
+	
+	:bash:`pip install -r fanova/requirements.txt`
 
 	:bash:`python setup.py install`
 
