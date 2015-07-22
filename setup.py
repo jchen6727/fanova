@@ -53,8 +53,6 @@ setup(
                         'matplotlib>=1.4.2',
                         'ParameterConfigSpace'],
 
-    dependency_links=['https://github.com/automl/ParameterConfigSpace/archive/master.zip'],
-
     author = "Tobias Domhan, Aaron Klein (python wrapper). Frank Hutter (FANOVA)",
     author_email = "kleinaa@cs.uni-freiburg.de",
     description = "Functional ANOVA: an implementation of the ICML 2014 paper 'An Efficient Approach for Assessing Hyperparameter Importance' by Frank Hutter, Holger Hoos and Kevin Leyton-Brown.",
