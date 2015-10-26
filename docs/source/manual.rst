@@ -6,7 +6,7 @@ Manual
 
 Quick Start
 -----------
-To run the examples, just download the `data <fanova/example/online_lda.tar.gz>`_ and start the python console.
+To run the examples, just download the `data <https://github.com/automl/fanova/blob/master/fanova/example/online_lda.tar.gz>`_ and start the python console.
 We can then import Fanova and start it by typing
 
     >>> from pyfanova.fanova import Fanova
