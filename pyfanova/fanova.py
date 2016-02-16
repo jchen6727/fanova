@@ -19,7 +19,7 @@ def check_java_version():
     if len(out) < 1:
         print("Failed checking Java version. Make sure Java version 7 or greater is installed.")
         return False
-    m = re.match('java version "\d+.(\d+)..*'.encode("utf-8"), out[0])
+    m = re.match('.*version "\d+.(\d+)..*'.encode("utf-8"), out[0])
     if m is None or len(m.groups()) < 1:
         print("Failed checking Java version. Make sure Java version 7 or greater is installed.")
         return False
