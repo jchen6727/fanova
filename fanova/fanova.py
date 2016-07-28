@@ -1,21 +1,92 @@
 import numpy as np
 from collections import OrderedDict
 import itertools as it
-from ConfigSpace.hyperparameters import CategoricalHyperparameter
+import pyrfr.regression
+import ConfigSpace
+from ConfigSpace.hyperparameters import CategoricalHyperparameter, UniformFloatHyperparameter
+
 
 class fANOVA(object):
-    def __init__(self, cs, forest):
+    def __init__(self, X=None, Y=None, cs=None, forest=None, 
+                num_trees=16, seed=None, bootstrapping=True,
+                points_per_tree = None, max_features=None,
+                min_samples_split=0, min_samples_leaf=0,
+                max_depth=64):
+
         """
         Calculate and provide midpoints and sizes from the forest's 
         split values in order to get the marginals
         
         Parameters
         ------------
+        X: matrix with the features
+        
+        Y: vector with the response values
+        
         cs : ConfigSpace instantiation
         
         forest: trained random forest
+
+        num_trees: number of trees in the forest to be fit
         
+        seed: seed for the forests randomness
+        
+        bootstrapping: whether or not to bootstrap the data for each tree
+        
+        points_per_tree: number of points used for each tree (only subsampling if bootstrapping is false)
+        
+        max_features: number of features to be used at each split, default is 70%
+        
+        min_samples_split: minimum number of samples required to attempt to split 
+        
+        min_samples_leaf: minimum number of samples required in a leaf
+        
+        max_depth: maximal depth of each tree in the forest
         """
+
+        
+        # if no ConfigSpace is specified, let's build one with all continuous variables
+        if (cs is None):
+            if (X is None) or (Y is None):
+                raise RuntimeError("If no ConfigSpace argument is given, you have to "
+                                    "provide data for X and Y.")
+
+
+            # if no info is given, use min and max values of each variable as bounds
+            pcs = list(zip( np.min(X,axis=0), np.max(X, axis=0) ))
+            cs = ConfigSpace.ConfigurationSpace()
+            for i in range(len(pcs)):
+                cs.add_hyperparameter(UniformFloatHyperparameter("%i" %i, pcs[i][0], pcs[i][1]))
+
+
+        # at this point we have a valid ConfigSpace object
+        # TODO: add some basic sanity checks for it (number of parameters, values,...)
+
+        
+        # if no forest has been trained yes, than 
+        if (forest is None):
+            if (X is None) or (Y is None):
+                raise RuntimeError("If no pyrfr forest is present, you have to "
+                                    "provide data for X and Y.")
+
+            forest = pyrfr.regression.binary_rss()
+            forest.num_trees=num_trees
+            forest.seed= np.random.randint(2**31-1) if seed is None else seed
+            forest.do_bootstrapping=bootstrapping
+            forest.num_data_points_per_tree=X.shape[0] if points_per_tree is None else points_per_tree
+            forest.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
+
+            forest.min_samples_to_split = min_samples_split
+            forest.min_samples_in_leaf = min_samples_leaf
+            forest.max_depth=max_depth
+            forest.epsilon_purity = 1e-8
+
+            # TODO: Get types from the ConfigSpace
+            types = np.zeros(X.shape[1],dtype=np.uint)
+            data = pyrfr.regression.numpy_data_container(X, Y, types)
+            forest.fit(data)
+
+
         # initialize a dictionary with parameter dims
         self.param_dic = OrderedDict([('parameters', OrderedDict([]))])       
         self.the_forest = forest
@@ -155,9 +226,9 @@ class fANOVA(object):
         double
             marginal value
         """
-        tree_midpoints = self.all_midpoints[0]
-        sample = np.ones(len(tree_midpoints))
-        sample[:] = np.nan
+        num_dims = len(self.all_midpoints[0])
+        sample = np.empty(num_dims, dtype=np.float)
+        sample.fill(np.NAN)
         for i in range(len(dimlist)):
             sample[dimlist[i]] = valuesToPredict[i]
         preds = self.the_forest.marginalized_prediction(sample)
