@@ -3,8 +3,8 @@ import numpy as np
 import fanova
 import fanova.visualizer as visualizer
 
-import pyrfr.regression
-
+import ConfigSpace
+from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 
 import os
 path = os.path.dirname(os.path.realpath(__file__))
@@ -16,9 +16,15 @@ plot_dir = path + '/example_data/test_plots'
 features = np.loadtxt(path + '/example_data/diabetes_features.csv', delimiter=",")
 responses = np.loadtxt(path + '/example_data/diabetes_responses.csv', delimiter=",")
 
+# config space
+pcs = list(zip(np.min(features,axis=0), np.max(features, axis=0)))
+cs = ConfigSpace.ConfigurationSpace()
+for i in range(len(pcs)):
+	cs.add_hyperparameter(UniformFloatHyperparameter("%i" %i, pcs[i][0], pcs[i][1]))
+
 
 # create an instance of fanova with trained forest and ConfigSpace
-f = fanova.fANOVA(X = features, Y = responses)
+f = fanova.fANOVA(X = features, Y = responses, cs=cs)
 
 # marginal of particular parameter:
 dims = list([1])
