@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from collections import OrderedDict
 import itertools as it
 import pyrfr.regression
@@ -58,9 +59,22 @@ class fANOVA(object):
             for i in range(len(pcs)):
                 cs.add_hyperparameter(UniformFloatHyperparameter("%i" %i, pcs[i][0], pcs[i][1]))
 
-
+        self.cs = cs        
+        self.cs_params =self.cs.get_hyperparameters()
         # at this point we have a valid ConfigSpace object
-        # TODO: add some basic sanity checks for it (number of parameters, values,...)
+        # check if param number is correct etc:
+        if X.shape[1] != len(self.cs_params):
+            raise RuntimeError('Number of parameters in config space do not match input X')
+        for i in range(len(self.cs_params)):
+            if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
+                if (np.max(X[:,i]) > self.cs_params[i].upper) or (np.min(X[:,i]) > self.cs_params[i].lower):
+                    raise RuntimeError('Some sample values from X are not in the given interval')
+            else:
+                unique_vals = set(X[:,i])
+                if len(unique_vals) > self.cs_params[i]._num_choices:
+                    raise RuntimeError('There are some categoricals missing in the config space specification')
+                if len(unique_vals) < self.cs_params[i]._num_choices:
+                    raise RuntimeError('There are too many categoricals specified in the config space')
 
         
         # if no forest has been trained yes, than 
@@ -90,9 +104,6 @@ class fANOVA(object):
         # initialize a dictionary with parameter dims
         self.param_dic = OrderedDict([('parameters', OrderedDict([]))])       
         self.the_forest = forest
-        self.cs = cs
-        
-        self.cs_params =self.cs.get_hyperparameters()
         types = np.zeros(len(self.cs_params), dtype=np.uint)
         # getting split values
         forest_split_values = self.the_forest.all_split_values(types)
@@ -108,27 +119,29 @@ class fANOVA(object):
             if not isinstance(param, (CategoricalHyperparameter)):
                 val_mins.append(param.lower)
                 val_maxs.append(param.upper)
+            else:
+                val_mins.append(np.nan)
+                val_maxs.append(np.nan)
             
         for tree_split_values in forest_split_values:
             # considering the hyperparam settings
             updated_array = []
-            # categoricals are treated differently 
-            j = 0          
+            # categoricals are treated differently        
             for i in range(len(tree_split_values)):
-                if isinstance(tree_split_values[i], (CategoricalHyperparameter)):
-                    i +=1
-                else:
-                    plus_setting = [val_mins[j]] + tree_split_values[i]
-                    plus_setting.append(val_maxs[j])
-                    j +=1
+                if not math.isnan(val_mins[i]):
+                    plus_setting = [val_mins[i]] + tree_split_values[i]
+                    plus_setting.append(val_maxs[i])
                     updated_array.append(plus_setting)
+                else:
+                    updated_array.append(tree_split_values[i])
             var_splits = updated_array
             sizes =[]
             midpoints =  []
+            i = 0
             for var_splits in tree_split_values:
-                if isinstance(var_splits, (CategoricalHyperparameter)):
+                if isinstance(self.cs_params[i], (CategoricalHyperparameter)):
                     midpoint_p = var_splits
-                    size = 1
+                    size = np.ones(len(midpoint_p))
                     midpoints.append(midpoint_p)
                     sizes.append(size)
                 else:
@@ -137,6 +150,7 @@ class fANOVA(object):
                     size = np.array(var_splits[1:]) - np.array(var_splits[:-1])
                     midpoints.append(midpoint_p)
                     sizes.append(size)
+                i += 1
             # all midpoints treewise for the whole forest
             self.all_midpoints.append(midpoints)
             self.all_sizes.append(sizes)
@@ -184,7 +198,10 @@ class fANOVA(object):
                             singleVarianceContributions = []
                             for i in range(len(points)):
                                 sample[dim_helper[i]] = points[i]
-                            interval_size.append(interval_sizes[dim_helper[i]])
+                                if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
+                                    interval_size.append(interval_sizes[dim_helper[i]])
+                                else:
+                                    interval_size.append(1)
                             pred = self.the_forest.marginalized_prediction(sample)
                             marg = pred[tree]
                             weightedSum += marg*np.prod(np.array(interval_size))
@@ -233,7 +250,7 @@ class fANOVA(object):
             sample[dimlist[i]] = valuesToPredict[i]
         preds = self.the_forest.marginalized_prediction(sample)
     
-        return np.mean(preds), np.var(preds)
+        return np.mean(preds), np.std(preds)
 
     def get_most_important_pairwise_marginals(self, n=10):
         """

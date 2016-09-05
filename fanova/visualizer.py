@@ -119,6 +119,7 @@ class Visualizer(object):
         lower_bound = self.cs_params[param].lower
         upper_bound = self.cs_params[param].upper
         param_name = self.cs_params[param].name
+
         grid = np.linspace(lower_bound, upper_bound, resolution)
       
         mean = np.zeros(resolution)
@@ -130,7 +131,7 @@ class Visualizer(object):
             std[i] = s
         mean = np.asarray(mean)
         std = np.asarray(std)
-
+        
         lower_curve = mean - std
         upper_curve = mean + std
 

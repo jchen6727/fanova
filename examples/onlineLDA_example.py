@@ -3,7 +3,7 @@ from smac.configspace import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 import csv
 import fanova
-import fanova.visualizer as visualizer
+import visualizer
 
 import os
 path = os.path.dirname(os.path.realpath(__file__))
@@ -13,6 +13,8 @@ plot_dir = path + '/example_data/test_plots'
 # get sample data from online lda
 data = np.loadtxt(path + '/example_data/online_lda/uniq_configurations-it2.csv', delimiter=",")
 X = data[:,1:]
+
+#print(X_new)
 # get responses
 y = []
 with open(path + '/example_data/online_lda/runs_and_results-it2.csv', 'r') as csvfile:
@@ -20,10 +22,10 @@ with open(path + '/example_data/online_lda/runs_and_results-it2.csv', 'r') as cs
     # skip first row
     next(csvreader)
     for row in csvreader:
-        y.append(row[3])
+        y.append(row[10])
 
 Y = np.array([float(i) for i in y[:len(X)]])
-print(y)
+
 # setting up config space:
 param_file = path + '/example_data/online_lda/param-file.txt'
 f = open(param_file, 'rb')
@@ -33,10 +35,9 @@ for row in f:
 
 # create an instance of fanova with trained forest and ConfigSpace
 f = fanova.fANOVA(X = X, Y = Y, cs=cs)
-# getting the 10 most important pairwise marginals sorted by importance
+# getting the most important pairwise marginals sorted by importance
 best_margs = f.get_most_important_pairwise_marginals(n=3)
 print(best_margs)
-
 # visualizations:
 # first create an instance of the visualizer with fanova object and configspace
 vis = visualizer.Visualizer(f, cs)
