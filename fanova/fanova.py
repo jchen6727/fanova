@@ -76,8 +76,18 @@ class fANOVA(object):
                 if len(unique_vals) < self.cs_params[i]._num_choices:
                     raise RuntimeError('There are too many categoricals specified in the config space')
 
+
+
+        # initialize all types as 0
+        types = np.zeros(len(self.cs_params), dtype=np.uint)
+        # retrieve the types from the ConfigSpace 
+        # TODO: Test if that actually works
+        for i, hp in enumerate(self.cs):
+            if isinstance( hp , CategoricalHyperparameter):
+                types[i] = len(hp.choices)
+
         
-        # if no forest has been trained yes, than 
+        # train a random forest if none is provided
         if (forest is None):
             if (X is None) or (Y is None):
                 raise RuntimeError("If no pyrfr forest is present, you have to "
@@ -95,16 +105,21 @@ class fANOVA(object):
             forest.max_depth=max_depth
             forest.epsilon_purity = 1e-8
 
-            # TODO: Get types from the ConfigSpace
-            types = np.zeros(X.shape[1],dtype=np.uint)
+
             data = pyrfr.regression.numpy_data_container(X, Y, types)
             forest.fit(data)
+        """soon
+        # 
+        else:
+            assert( types == forest.get_types())
+        """
 
+        self.the_forest = forest
 
         # initialize a dictionary with parameter dims
         self.param_dic = OrderedDict([('parameters', OrderedDict([]))])       
-        self.the_forest = forest
-        types = np.zeros(len(self.cs_params), dtype=np.uint)
+
+
         # getting split values
         forest_split_values = self.the_forest.all_split_values(types)
         
@@ -116,30 +131,29 @@ class fANOVA(object):
         val_mins = []
         val_maxs = []
         for param in self.cs_params:
-            if not isinstance(param, (CategoricalHyperparameter)):
+            if isinstance(param, (CategoricalHyperparameter)):
+                val_mins.append(None)
+                val_maxs.append(None)
+            else:
                 val_mins.append(param.lower)
                 val_maxs.append(param.upper)
-            else:
-                val_mins.append(np.nan)
-                val_maxs.append(np.nan)
             
         for tree_split_values in forest_split_values:
             # considering the hyperparam settings
             updated_array = []
             # categoricals are treated differently        
             for i in range(len(tree_split_values)):
-                if not math.isnan(val_mins[i]):
-                    plus_setting = [val_mins[i]] + tree_split_values[i]
-                    plus_setting.append(val_maxs[i])
-                    updated_array.append(plus_setting)
-                else:
+                if val_mins[i] is None:
                     updated_array.append(tree_split_values[i])
+                else:
+                    plus_setting = [val_mins[i]] + tree_split_values[i] + [val_maxs[i]]
+                    updated_array.append(plus_setting)
+                    
             var_splits = updated_array
             sizes =[]
             midpoints =  []
-            i = 0
-            for var_splits in tree_split_values:
-                if isinstance(self.cs_params[i], (CategoricalHyperparameter)):
+            for i, var_splits in enumerate(tree_split_values):
+                if val_mins[i] is None: # categorical parameter
                     midpoint_p = var_splits
                     size = np.ones(len(midpoint_p))
                     midpoints.append(midpoint_p)
@@ -150,7 +164,7 @@ class fANOVA(object):
                     size = np.array(var_splits[1:]) - np.array(var_splits[:-1])
                     midpoints.append(midpoint_p)
                     sizes.append(size)
-                i += 1
+
             # all midpoints treewise for the whole forest
             self.all_midpoints.append(midpoints)
             self.all_sizes.append(sizes)
@@ -174,17 +188,17 @@ class fANOVA(object):
         
         K = len(dim_list)
         for k in range(1,K+1):
-            for dimension in tuple(it.combinations(dim_list, k)):
-                if self.param_dic['parameters'].has_key(dimension):
-                    thisMarginalVarianceContribution = self.param_dic['parameters'][dimension]['MarginalVarianceContribution']                    
-                
+            for dimensions in tuple(it.combinations(dim_list, k)):
+				# check if the value has been computed previously
+                if self.param_dic['parameters'].has_key(dimensions):
+                    thisMarginalVarianceContribution = self.param_dic['parameters'][dimension]['MarginalVarianceContribution']
                 else:
                     for tree in range(len(self.all_midpoints)):
-                        sample = np.ones(len(self.all_midpoints[tree]))
+                        sample = np.ones(len(self.all_midpoints[tree]), dtype=np.float)
                         combi_midpoints = []
                         sizes = []
                         dim_helper = []
-                        for dim in dimension:
+                        for dim in dimensions:
                             combi_midpoints.append(self.all_midpoints[tree][dim])
                             sizes.append(self.all_sizes[tree][dim])
                             dim_helper.append(dim)
@@ -217,10 +231,10 @@ class fANOVA(object):
                                     singleVarianceContributions.append(self.param_dic['parameters'][(dim_helper[i], )]['MarginalVarianceContribution'])
                                 for singleVarianceContribution in singleVarianceContributions:
                                     thisMarginalVarianceContribution -= singleVarianceContribution
-                                    params = tuple(dim_helper)
-                                    # store it into dictionary as tuple
-                                    self.param_dic['parameters'][params] = {}
-                                    self.param_dic['parameters'][params]['MarginalVarianceContribution'] = thisMarginalVarianceContribution
+                                params = tuple(dim_helper)
+								# store it into dictionary as tuple
+								self.param_dic['parameters'][params] = {}
+								self.param_dic['parameters'][params]['MarginalVarianceContribution'] = thisMarginalVarianceContribution
         
         return thisMarginalVarianceContribution
 
@@ -267,9 +281,8 @@ class fANOVA(object):
              Contains the n most important pairwise marginals
         """
         pairwise_marginals = []
-        dimensions = np.arange(len(self.cs_params))
-        param_combis = list(it.combinations(dimensions,2))
-        for combi in param_combis:
+        dimensions = range(len(self.cs_params))
+        for combi in it.combinations(dimensions,2):
             pairwise_marginal_performance = self.get_marginal(combi)
             pairwise_marginals.append((pairwise_marginal_performance, combi[0], combi[1]))
         
