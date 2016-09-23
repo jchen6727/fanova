@@ -82,7 +82,7 @@ class fANOVA(object):
         types = np.zeros(len(self.cs_params), dtype=np.uint)
         # retrieve the types from the ConfigSpace 
         # TODO: Test if that actually works
-        for i, hp in enumerate(self.cs):
+        for i, hp in enumerate(self.cs_params):
             if isinstance( hp , CategoricalHyperparameter):
                 types[i] = len(hp.choices)
 
@@ -191,7 +191,7 @@ class fANOVA(object):
             for dimensions in tuple(it.combinations(dim_list, k)):
 				# check if the value has been computed previously
                 if self.param_dic['parameters'].has_key(dimensions):
-                    thisMarginalVarianceContribution = self.param_dic['parameters'][dimension]['MarginalVarianceContribution']
+                    thisMarginalVarianceContribution = self.param_dic['parameters'][dimensions]['MarginalVarianceContribution']
                 else:
                     for tree in range(len(self.all_midpoints)):
                         sample = np.ones(len(self.all_midpoints[tree]), dtype=np.float)
@@ -221,21 +221,30 @@ class fANOVA(object):
                             weightedSum += marg*np.prod(np.array(interval_size))
                             weightedSumOfSquares += np.power(marg,2)*np.prod(np.array(interval_size))
                             thisMarginalVarianceContribution = weightedSumOfSquares - np.power(weightedSum,2)
-                            if len(dimension)== 1:
+                            if len(dimensions)== 1:
                                 # store into dictionary as one param
-                                self.param_dic['parameters'][dimension] = {}
-                                self.param_dic['parameters'][dimension]['Name'] = self.cs_params[dim].name
-                                self.param_dic['parameters'][dimension]['MarginalVarianceContribution'] = thisMarginalVarianceContribution 
+                                self.param_dic['parameters'][dimensions] = {}
+                                self.param_dic['parameters'][dimensions]['Name'] = self.cs_params[dim].name
+                                self.param_dic['parameters'][dimensions]['MarginalVarianceContribution'] = thisMarginalVarianceContribution 
                             else:
-                                for i in range(len(points)):
-                                    singleVarianceContributions.append(self.param_dic['parameters'][(dim_helper[i], )]['MarginalVarianceContribution'])
-                                for singleVarianceContribution in singleVarianceContributions:
-                                    thisMarginalVarianceContribution -= singleVarianceContribution
+                                if len(dimensions) > 2:
+                                    singleVar_dims = tuple(it.combinations(dim_list, k-1))
+                                    #for single_Var_dims in singleVar_tuples
+                                    for i in range(len(points)):
+                                        singleVarianceContributions.append(self.param_dic['parameters'][singleVar_dims[i]]['MarginalVarianceContribution'])
+                                    for singleVarianceContribution in singleVarianceContributions:
+                                        thisMarginalVarianceContribution -= singleVarianceContribution
+                                else:
+                                    
+                                    for i in range(len(points)):
+                                        singleVarianceContributions.append(self.param_dic['parameters'][(dim_helper[i], )]['MarginalVarianceContribution'])
+                                    for singleVarianceContribution in singleVarianceContributions:
+                                        thisMarginalVarianceContribution -= singleVarianceContribution
                                 params = tuple(dim_helper)
-								# store it into dictionary as tuple
-								self.param_dic['parameters'][params] = {}
-								self.param_dic['parameters'][params]['MarginalVarianceContribution'] = thisMarginalVarianceContribution
-        
+                                # store it into dictionary as tuple
+                                self.param_dic['parameters'][params] = {}
+                                self.param_dic['parameters'][params]['MarginalVarianceContribution'] = thisMarginalVarianceContribution
+        print(self.param_dic)
         return thisMarginalVarianceContribution
 
         
