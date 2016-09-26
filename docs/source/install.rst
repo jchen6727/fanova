@@ -8,13 +8,11 @@ Requirements
 ------------
 Fanova requires:
 
-
-`Java 7 <https://jdk7.java.net/download.html>`_
-
 `Numpy <https://pypi.python.org/pypi/numpy>`_
 
 `matplotlib <http://matplotlib.org/>`_ (Version 1.4.2)
 
+`pyrfr <https://pypi.python.org/pypi/pyrfr/>`_
 
 Manually
 ------------

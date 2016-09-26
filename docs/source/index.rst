@@ -7,7 +7,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   includeme
    install
    manual
    cite
+
 
