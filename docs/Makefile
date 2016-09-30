@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = ../../fanova-docs
+BUILDDIR      = source
 PDFBUILDDIR   = /tmp
 
 # User-friendly check for sphinx-build
