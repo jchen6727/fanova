@@ -140,16 +140,16 @@ class fANOVA(object):
             
         for tree_split_values in forest_split_values:
             # considering the hyperparam settings
-            updated_array = []
+            var_splits = []
             # categoricals are treated differently        
             for i in range(len(tree_split_values)):
                 if val_mins[i] is None:
-                    updated_array.append(tree_split_values[i])
+                    var_splits.append(tree_split_values[i])
                 else:
                     plus_setting = [val_mins[i]] + tree_split_values[i] + [val_maxs[i]]
-                    updated_array.append(plus_setting)
+                    var_splits.append(plus_setting)
                     
-            var_splits = updated_array
+    
             sizes =[]
             midpoints =  []
             for i, var_splits in enumerate(tree_split_values):
@@ -207,26 +207,31 @@ class fANOVA(object):
                         sample[:] = np.nan
                         weightedSum = 0
                         weightedSumOfSquares = 0
-                        for points in midpoints:
-                            interval_size = []
+                        
+                        for i, points in enumerate(midpoints):
                             singleVarianceContributions = []
-                            for i in range(len(points)):
-                                sample[dim_helper[i]] = points[i]
-                                if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
-                                    interval_size.append(interval_sizes[dim_helper[i]])
-                                else:
-                                    interval_size.append(1)
+                            for j in range(len(points)):
+                                sample[dim_helper[j]] = points[j]
+   
                             pred = self.the_forest.marginalized_prediction(sample)
                             marg = pred[tree]
-                            weightedSum += marg*np.prod(np.array(interval_size))
-                            weightedSumOfSquares += np.power(marg,2)*np.prod(np.array(interval_size))
-                            thisMarginalVarianceContribution = weightedSumOfSquares - np.power(weightedSum,2)
+                            
+                            # TODO: calculate and return "totalFractionsExplained"
+
                             if len(dimensions)== 1:
+                                weightedSum += marg*self.all_sizes[tree][dim][i]
+                                weightedSumOfSquares += np.power(marg,2)*self.all_sizes[tree][dim][i]
+                                thisMarginalVarianceContribution = weightedSumOfSquares - np.power(weightedSum,2)
                                 # store into dictionary as one param
                                 self.param_dic['parameters'][dimensions] = {}
                                 self.param_dic['parameters'][dimensions]['Name'] = self.cs_params[dim].name
                                 self.param_dic['parameters'][dimensions]['MarginalVarianceContribution'] = thisMarginalVarianceContribution 
                             else:
+
+                                weightedSum += marg*np.prod(np.array(interval_sizes[i]))
+                                weightedSumOfSquares += np.power(marg,2)*np.prod(np.array(interval_sizes[i]))
+                                thisMarginalVarianceContribution = weightedSumOfSquares - np.power(weightedSum,2)
+                                
                                 if len(dimensions) > 2:
                                     singleVar_dims = tuple(it.combinations(dim_list, k-1))
                                     #for single_Var_dims in singleVar_tuples
@@ -244,7 +249,7 @@ class fANOVA(object):
                                 # store it into dictionary as tuple
                                 self.param_dic['parameters'][params] = {}
                                 self.param_dic['parameters'][params]['MarginalVarianceContribution'] = thisMarginalVarianceContribution
-        print(self.param_dic)
+
         return thisMarginalVarianceContribution
 
         
