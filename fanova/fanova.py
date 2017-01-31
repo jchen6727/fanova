@@ -3,6 +3,7 @@ import math
 from collections import OrderedDict
 import itertools as it
 import pyrfr.regression
+import pyrfr.util
 import ConfigSpace
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, UniformFloatHyperparameter
 
@@ -34,7 +35,8 @@ class fANOVA(object):
         
         bootstrapping: whether or not to bootstrap the data for each tree
         
-        points_per_tree: number of points used for each tree (only subsampling if bootstrapping is false)
+        points_per_tree: number of points used for each tree 
+                        (only subsampling if bootstrapping is false)
         
         max_features: number of features to be used at each split, default is 70%
         
@@ -45,7 +47,7 @@ class fANOVA(object):
         max_depth: maximal depth of each tree in the forest
         """
 
-        
+        self.num_trees = num_trees
         # if no ConfigSpace is specified, let's build one with all continuous variables
         if (cs is None):
             if (X is None) or (Y is None):
@@ -93,21 +95,23 @@ class fANOVA(object):
                 raise RuntimeError("If no pyrfr forest is present, you have to "
                                     "provide data for X and Y.")
 
-            forest = pyrfr.regression.binary_rss()
-            forest.num_trees=num_trees
+            forest = pyrfr.regression.binary_rss_forest()
+            forest.options.num_trees = num_trees
             forest.seed= np.random.randint(2**31-1) if seed is None else seed
-            forest.do_bootstrapping=bootstrapping
-            forest.num_data_points_per_tree=X.shape[0] if points_per_tree is None else points_per_tree
-            forest.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
+            forest.options.do_bootstrapping = bootstrapping
+            forest.options.num_data_points_per_tree = X.shape[0] if points_per_tree is None else points_per_tree
+            forest.options.tree_opts.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
 
-            forest.min_samples_to_split = min_samples_split
-            forest.min_samples_in_leaf = min_samples_leaf
-            forest.max_depth=max_depth
-            forest.epsilon_purity = 1e-8
+            #forest.min_samples_to_split = min_samples_split
+            #forest.min_samples_in_leaf = min_samples_leaf
+            #forest.max_depth=max_depth
+            #forest.epsilon_purity = 1e-8
 
-
-            data = pyrfr.regression.numpy_data_container(X, Y, types)
-            forest.fit(data)
+            rng = pyrfr.regression.default_random_engine()
+            data = pyrfr.regression.data_container()
+            for i in range(len(Y)):
+                data.add_data_point(X[i],Y[i])
+            forest.fit(data, rng)
         """soon
         # 
         else:
@@ -170,7 +174,7 @@ class fANOVA(object):
             self.all_sizes.append(sizes)
         
 
-    def get_marginal(self, dim_list):
+    def get_marginal(self, dim_list, outputdict=False):
         """
         Returns the marginal of selected parameters
                 
@@ -179,11 +183,14 @@ class fANOVA(object):
         dim_list: list
                 Contains the indices of ConfigSpace for the selected parameters 
                 (starts with 0) 
-             
+        
+        outputdict : boolean
+                    returns the whole dictionary with all previously 
+                    calculated marginals
         Returns
         -------
-        double
-            marginal value
+        default : double
+                marginal value
         """        
         
         K = len(dim_list)
@@ -207,20 +214,20 @@ class fANOVA(object):
                         sample[:] = np.nan
                         weightedSum = 0
                         weightedSumOfSquares = 0
-                        
+                        prev_FraqExp = 0
                         for i, points in enumerate(midpoints):
                             singleVarianceContributions = []
                             for j in range(len(points)):
                                 sample[dim_helper[j]] = points[j]
    
-                            pred = self.the_forest.marginalized_prediction(sample)
+                            pred = self.the_forest.marginal_mean_prediction(sample)
                             marg = pred[tree]
                             
-                            # TODO: calculate and return "totalFractionsExplained"
-
+                            w_stats = pyrfr.util.weighted_running_stats()
                             if len(dimensions)== 1:
-                                weightedSum += marg*self.all_sizes[tree][dim][i]
-                                weightedSumOfSquares += np.power(marg,2)*self.all_sizes[tree][dim][i]
+                                # weightedSum += marg*self.all_sizes[tree][dim][i]
+                                # weightedSumOfSquares += np.power(marg,2)*self.all_sizes[tree][dim][i]
+                                weightedSumOfSquares += w_stats.push(marg, self.all_sizes[tree][dim][i]).variance_unbiased_importance()
                                 thisMarginalVarianceContribution = weightedSumOfSquares - np.power(weightedSum,2)
                                 # store into dictionary as one param
                                 self.param_dic['parameters'][dimensions] = {}
@@ -246,11 +253,16 @@ class fANOVA(object):
                                     for singleVarianceContribution in singleVarianceContributions:
                                         thisMarginalVarianceContribution -= singleVarianceContribution
                                 params = tuple(dim_helper)
+                                
+                                # ToDO computeTotalVarianceOfRegressionTree treewise
+                                totalFractionsExplained = prev_FraqExp + 1/(self.num_trees*(thisMarginalVarianceContribution/thisTreeTotalVar*100))
+                                prev_FraqExp = self.num_trees*(thisMarginalVarianceContribution/thisTreeTotalVar*100)
                                 # store it into dictionary as tuple
                                 self.param_dic['parameters'][params] = {}
-                                self.param_dic['parameters'][params]['MarginalVarianceContribution'] = thisMarginalVarianceContribution
-
-        return thisMarginalVarianceContribution
+                                self.param_dic['parameters'][params]['MarginalVarianceContribution'] = totalFractionsExplained
+            return self.param_dict
+        else:
+            return totalFractionsExplained
 
         
     def get_marginal_for_values(self, dimlist, valuesToPredict):
@@ -276,7 +288,7 @@ class fANOVA(object):
         sample.fill(np.NAN)
         for i in range(len(dimlist)):
             sample[dimlist[i]] = valuesToPredict[i]
-        preds = self.the_forest.marginalized_prediction(sample)
+        preds = self.the_forest.marginal_mean_prediction(sample)
     
         return np.mean(preds), np.std(preds)
 
