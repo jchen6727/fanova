@@ -1,8 +1,7 @@
 import numpy as np
-import math
 from collections import OrderedDict
 import itertools as it
-import pyrfr.regression
+import pyrfr.regression as reg
 import pyrfr.util
 import ConfigSpace
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, UniformFloatHyperparameter
@@ -95,20 +94,20 @@ class fANOVA(object):
                 raise RuntimeError("If no pyrfr forest is present, you have to "
                                     "provide data for X and Y.")
 
-            forest = pyrfr.regression.binary_rss_forest()
+            forest = reg.fanova_forest()
             forest.options.num_trees = num_trees
-            forest.seed= np.random.randint(2**31-1) if seed is None else seed
+            forest.options.seed = np.random.randint(2**31-1) if seed is None else seed
             forest.options.do_bootstrapping = bootstrapping
             forest.options.num_data_points_per_tree = X.shape[0] if points_per_tree is None else points_per_tree
-            forest.options.tree_opts.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
+            forest.options.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
 
             #forest.min_samples_to_split = min_samples_split
             #forest.min_samples_in_leaf = min_samples_leaf
             #forest.max_depth=max_depth
             #forest.epsilon_purity = 1e-8
 
-            rng = pyrfr.regression.default_random_engine()
-            data = pyrfr.regression.data_container()
+            rng = reg.default_random_engine()
+            data = reg.data_container()
             for i in range(len(Y)):
                 data.add_data_point(X[i],Y[i])
             forest.fit(data, rng)
