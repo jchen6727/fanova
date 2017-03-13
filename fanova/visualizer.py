@@ -37,9 +37,9 @@ class Visualizer(object):
             outfile_name = os.path.join(directory, param_name.replace(os.sep, "_") + ".png")
             print("creating %s" % outfile_name)
             if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
-                self.plot_categorical_marginal(param)
+                self.plot_categorical_marginal(param, show=False)
             else:
-                self.plot_marginal(param, **kwargs)
+                self.plot_marginal(param, show=False, **kwargs)
             plt.savefig(outfile_name)
         # additional pairwise plots:
         dimensions = []
@@ -57,7 +57,7 @@ class Visualizer(object):
             self.plot_pairwise_marginal(combi, **kwargs)
             plt.savefig(outfile_name)
 
-    def plot_pairwise_marginal(self, param_list, resolution=20):
+    def plot_pairwise_marginal(self, param_list, resolution=20, show=True):
         """
         Creates a plot of pairwise marginal of a selected parameters
         
@@ -72,6 +72,8 @@ class Visualizer(object):
             values to predict
 
         """
+        assert len(param_list) == 2, "You have to specify 2 (different) parameters"
+        
         grid_list = []
         param_names = []
         for p in range(len(param_list)):
@@ -84,7 +86,7 @@ class Visualizer(object):
         zz = np.zeros([resolution * resolution])
         for i, y_value in enumerate(grid_list[1]):
             for j, x_value in enumerate(grid_list[0]):
-                zz[i * resolution + j] = self.fanova.get_marginal_for_values(param_list, [x_value, y_value])[0]
+                zz[i * resolution + j] = self.fanova.marginal_mean_variance_for_values(param_list, [x_value, y_value])[0]
 
         zz = np.reshape(zz, [resolution, resolution])
 
@@ -98,9 +100,12 @@ class Visualizer(object):
         ax.set_ylabel(param_names[1])
         ax.set_zlabel("Performance")
         fig.colorbar(surface, shrink=0.5, aspect=5)
-        return plt
+        if show:
+            plt.show()
+        else:
+            return plt
 
-    def plot_marginal(self, param, resolution=100, log_scale=False):
+    def plot_marginal(self, param, resolution=100, log_scale=False, show=True):
         """
         Creates a plot of marginal of a selected parameter
         
@@ -126,9 +131,9 @@ class Visualizer(object):
         std = np.zeros(resolution)
         dim = [param]
         for i in range(0, resolution):
-            (m, s) = self.fanova.get_marginal_for_values(dim, [grid[i]])
+            (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
             mean[i] = m
-            std[i] = s
+            std[i] = np.sqrt(v)
         mean = np.asarray(mean)
         std = np.asarray(std)
         
@@ -143,9 +148,12 @@ class Visualizer(object):
         plt.xlabel(param_name)
 
         plt.ylabel("Performance")
-        return plt
+        if show:
+            plt.show()
+        else:
+            return plt
         
-    def plot_categorical_marginal(self, param):
+    def plot_categorical_marginal(self, param, show=True):
         """
         Creates a plot of marginal of a selected categorical parameter
         
@@ -159,7 +167,7 @@ class Visualizer(object):
         param_name = self.cs_params[param].name
         labels= self.cs_params[param].choices
         categorical_size  = self.cs_params[param]._num_choices
-        marginals = [self.fanova.get_marginal_for_values([param], [i]) for i in range(categorical_size)]
+        marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
         mean, std = list(zip(*marginals))
 
         indices = np.arange(1,categorical_size+1, 1)
@@ -181,8 +189,10 @@ class Visualizer(object):
         
         plt.ylabel("Performance")
         plt.xlabel(param_name)
-
-        return plt
+        if show:
+            plt.show()
+        else:
+            return plt
         
     def create_most_important_pairwise_marginal_plots(self, directory, n=20):
         """
@@ -203,5 +213,5 @@ class Visualizer(object):
             outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_") + ".png")
             plt.clf()
             print("creating %s" % outfile_name)
-            self.plot_pairwise_marginal([param1, param2])
+            self.plot_pairwise_marginal([param1, param2], show=False)
             plt.savefig(outfile_name)
