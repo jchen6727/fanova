@@ -37,7 +37,7 @@ cs.add_hyperparameter(CategoricalHyperparameter('a6', ['1','2']))
 f = fanova.fANOVA(X = X, Y= y, cs=cs)
 # marginal of particular parameter:
 dims = list([0])
-res = f.get_marginal(dims)
+res = f.quantify_importance(dims)
 print(res)
 #plots
 vis = visualizer.Visualizer(f, cs)

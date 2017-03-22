@@ -3,7 +3,7 @@ from smac.configspace import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 import csv
 import fanova
-import visualizer
+#import visualizer
 
 import os
 path = os.path.dirname(os.path.realpath(__file__))
@@ -29,13 +29,14 @@ f = open(param_file, 'rb')
 cs = ConfigurationSpace()
 for row in f:
     cs.add_hyperparameter(UniformFloatHyperparameter("%s" %row[0:4], np.float(row[6:9]), np.float(row[10:13]),np.float(row[18:21])))
+param = cs.get_hyperparameters()
 
 # create an instance of fanova with data for the random forest and the configSpace
-f = fanova.fANOVA(X = X, Y = Y, cs=cs)
+f = fanova.fANOVA(X = X, Y = Y)
 
 # marginal for first parameter
 p_list = [0]
-res = f.get_marginal(p_list)
+res = f.quantify_importance(p_list)
 print(res)
 
 # getting the most important pairwise marginals sorted by importance

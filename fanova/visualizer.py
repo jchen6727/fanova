@@ -57,15 +57,14 @@ class Visualizer(object):
             self.plot_pairwise_marginal(combi, **kwargs)
             plt.savefig(outfile_name)
 
-    def plot_pairwise_marginal(self, param_list, resolution=20, show=True):
+    def generate_pairwise_marginal(self, param_list, resolution=20):
         """
         Creates a plot of pairwise marginal of a selected parameters
         
         Parameters
         ------------
-        param_list: list
-            Contains the indices of ConfigSpace for the selected parameters 
-            (starts with 0) 
+        param_list: list of ints or strings
+            Contains the selected parameters  
         
         resolution: int
             Number of samples to generate from the parameter range as
@@ -77,18 +76,45 @@ class Visualizer(object):
         grid_list = []
         param_names = []
         for p in range(len(param_list)):
+            if type(p) == str:
+                p = self.cs.get_idx_by_hyperparameter_name(p)
             lower_bound = self.cs_params[p].lower
             upper_bound = self.cs_params[p].upper
             param_names.append(self.cs_params[p].name)
             grid = np.linspace(lower_bound, upper_bound, resolution)
             grid_list.append(grid)
-            
+
         zz = np.zeros([resolution * resolution])
         for i, y_value in enumerate(grid_list[1]):
             for j, x_value in enumerate(grid_list[0]):
                 zz[i * resolution + j] = self.fanova.marginal_mean_variance_for_values(param_list, [x_value, y_value])[0]
 
         zz = np.reshape(zz, [resolution, resolution])
+
+        return grid_list, zz
+
+    def plot_pairwise_marginal(self, param_list, resolution=20, show=True):
+        """
+        Creates a plot of pairwise marginal of a selected parameters
+        
+        Parameters
+        ------------
+        param_list: list of ints or strings
+            Contains the selected parameters
+        
+        resolution: int
+            Number of samples to generate from the parameter range as
+            values to predict
+
+        """
+        param_names = []
+        for p in range(len(param_list)):
+            if type(p) == str:
+                p = self.cs.get_idx_by_hyperparameter_name(p)
+            lower_bound = self.cs_params[p].lower
+            upper_bound = self.cs_params[p].upper
+            param_names.append(self.cs_params[p].name)
+        grid_list, zz = self.generate_pairwise_marginal(param_list, resolution)
 
         display_xx, display_yy = np.meshgrid(grid_list[0], grid_list[1])
 
@@ -105,13 +131,45 @@ class Visualizer(object):
         else:
             return plt
 
+    def generate_marginal(self, param, resoluton=100):
+        """
+        Creates marginals of a selected parameter for own plots
+        
+        Parameters
+        ------------
+        param: int or str
+            Index of chosen parameter in the ConfigSpace (starts with 0)
+        
+        resolution: int
+            Number of samples to generate from the parameter range as
+            values to predict
+        
+        """
+        if type(param) == str:
+            param = self.cs.get_idx_by_hyperparameter_name(param)
+        lower_bound = self.cs_params[param].lower
+        upper_bound = self.cs_params[param].upper
+        param_name = self.cs_params[param].name
+        grid = np.linspace(lower_bound, upper_bound, resolution)
+      
+        mean = np.zeros(resolution)
+        std = np.zeros(resolution)
+
+        dim = [param]
+        for i in range(0, resolution):
+            (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
+            mean[i] = m
+            std[i] = np.sqrt(v)
+
+        return mean, std
+
     def plot_marginal(self, param, resolution=100, log_scale=False, show=True):
         """
         Creates a plot of marginal of a selected parameter
         
         Parameters
         ------------
-        param: int
+        param: int or str
             Index of chosen parameter in the ConfigSpace (starts with 0)
         
         resolution: int
@@ -121,19 +179,13 @@ class Visualizer(object):
         log_scale: boolean
             If log scale is required or not
         """
+        if type(param) == str:
+            param = self.cs.get_idx_by_hyperparameter_name(param)
         lower_bound = self.cs_params[param].lower
         upper_bound = self.cs_params[param].upper
         param_name = self.cs_params[param].name
 
-        grid = np.linspace(lower_bound, upper_bound, resolution)
-      
-        mean = np.zeros(resolution)
-        std = np.zeros(resolution)
-        dim = [param]
-        for i in range(0, resolution):
-            (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
-            mean[i] = m
-            std[i] = np.sqrt(v)
+        mean, std = self.generate_marginal(param, resolution)
         mean = np.asarray(mean)
         std = np.asarray(std)
         
@@ -146,12 +198,32 @@ class Visualizer(object):
             plt.plot(grid, mean, 'b')
         plt.fill_between(grid, upper_curve, lower_curve, facecolor='red', alpha=0.6)
         plt.xlabel(param_name)
-
+        
         plt.ylabel("Performance")
         if show:
             plt.show()
         else:
             return plt
+
+    def get_categorical_marginal(self, param):
+        """
+        Creates marginals of a selected categorical parameter
+        
+        Parameters
+        ------------
+        param: int or str
+            Index of chosen categorical parameter in the ConfigSpace (starts with 0)
+        
+        """
+        if type(param) == str:
+            param = self.cs.get_idx_by_hyperparameter_name(param)
+        param_name = self.cs_params[param].name
+        labels= self.cs_params[param].choices
+        categorical_size  = self.cs_params[param]._num_choices
+        marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
+        mean, std = list(zip(*marginals))
+
+        return mean, std
         
     def plot_categorical_marginal(self, param, show=True):
         """
@@ -159,17 +231,17 @@ class Visualizer(object):
         
         Parameters
         ------------
-        param: int
+        param: int or str
             Index of chosen categorical parameter in the ConfigSpace (starts with 0)
         
         """
-        
+        if type(param) == str:
+            param = self.cs.get_idx_by_hyperparameter_name(param)
         param_name = self.cs_params[param].name
         labels= self.cs_params[param].choices
         categorical_size  = self.cs_params[param]._num_choices
-        marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
-        mean, std = list(zip(*marginals))
 
+        mean, std = self.get_categorical_marginal(param)
         indices = np.arange(1,categorical_size+1, 1)
         b = plt.boxplot([[x] for x in mean])
         plt.xticks(indices, labels)

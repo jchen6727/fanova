@@ -28,7 +28,7 @@ f = fanova.fANOVA(X = features, Y = responses, cs=cs)
 
 # marginal of particular parameter:
 dims = list([1])
-res = f.get_marginal(dims)
+res = f.quantify_importance(dims)
 print(res)
 
 # getting the 10 most important pairwise marginals sorted by importance

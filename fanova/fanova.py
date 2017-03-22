@@ -53,9 +53,16 @@ class fANOVA(object):
             # if no info is given, use min and max values of each variable as bounds
             config_space = ConfigSpace.ConfigurationSpace()
             for i,(mn, mx) in enumerate(zip(np.min(X,axis=0), np.max(X, axis=0) )):
+<<<<<<< HEAD
+                cs.add_hyperparameter(UniformFloatHyperparameter("x_%i" %i, mn, mx))
+                
+        self.percentiles = np.percentile(Y, range(0,100))
+        self.cs = cs        
+=======
                 config_space.add_hyperparameter(UniformFloatHyperparameter("x_%i" %i, mn, mx))
         
         self.cs = config_space
+>>>>>>> b9c68bea21a534214ef9631e616f7d2ac98802b4
         self.cs_params =self.cs.get_hyperparameters()
         self.n_dims = len(self.cs_params)
         self.n_trees = n_trees
@@ -168,7 +175,7 @@ class fANOVA(object):
         
 
         
-    def set_cutoffs(self, cutoffs = (-np.inf, np.inf)):
+    def set_cutoffs(self, cutoffs = (-np.inf, np.inf), quantile=None):
         """
             Setting the cutoffs to constrain the input space
             
@@ -179,8 +186,13 @@ class fANOVA(object):
             "Generalized Functional ANOVA Diagnostics for High Dimensional
             Functions of Dependent Variables" by Hooker.
         """
-        self.cutoffs = cutoffs
-        self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
+        if not (quantile is None):
+            percentile = self.percentiles[quantile]
+            self.the_forest.set_cutoffs(-percentile, percentile)
+        else:
+            
+            self.cutoffs = cutoffs
+            self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
         
         # reset all the variance fractions computed
         self.trees_variance_fractions = {}
