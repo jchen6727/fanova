@@ -3,7 +3,7 @@ from smac.configspace import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 import csv
 import fanova
-#import visualizer
+import visualizer
 
 import os
 path = os.path.dirname(os.path.realpath(__file__))
