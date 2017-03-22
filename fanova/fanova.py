@@ -53,16 +53,10 @@ class fANOVA(object):
             # if no info is given, use min and max values of each variable as bounds
             config_space = ConfigSpace.ConfigurationSpace()
             for i,(mn, mx) in enumerate(zip(np.min(X,axis=0), np.max(X, axis=0) )):
-<<<<<<< HEAD
                 cs.add_hyperparameter(UniformFloatHyperparameter("x_%i" %i, mn, mx))
                 
         self.percentiles = np.percentile(Y, range(0,100))
-        self.cs = cs        
-=======
-                config_space.add_hyperparameter(UniformFloatHyperparameter("x_%i" %i, mn, mx))
-        
-        self.cs = config_space
->>>>>>> b9c68bea21a534214ef9631e616f7d2ac98802b4
+	self.cs = config_space
         self.cs_params =self.cs.get_hyperparameters()
         self.n_dims = len(self.cs_params)
         self.n_trees = n_trees
