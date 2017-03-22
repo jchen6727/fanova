@@ -51,11 +51,11 @@ class fANOVA(object):
         # if no ConfigSpace is specified, let's build one with all continuous variables
         if (config_space is None):
             # if no info is given, use min and max values of each variable as bounds
-            cs = ConfigSpace.ConfigurationSpace()
+            config_space = ConfigSpace.ConfigurationSpace()
             for i,(mn, mx) in enumerate(zip(np.min(X,axis=0), np.max(X, axis=0) )):
-                cs.add_hyperparameter(UniformFloatHyperparameter("x_%i" %i, mn, mx))
+                config_space.add_hyperparameter(UniformFloatHyperparameter("x_%i" %i, mn, mx))
         
-        self.cs = cs        
+        self.cs = config_space
         self.cs_params =self.cs.get_hyperparameters()
         self.n_dims = len(self.cs_params)
         self.n_trees = n_trees
@@ -88,7 +88,7 @@ class fANOVA(object):
             else:
                 pcs[i] = (hp.lower, hp.upper)
 
-        
+        print(pcs)
         # set forest options
         forest = reg.fanova_forest()
         forest.options.num_trees = n_trees
@@ -103,7 +103,10 @@ class fANOVA(object):
         forest.options.tree_opts.epsilon_purity = 1e-8
 
         # create data conatainer and provide all the necessary information
-        rng = reg.default_random_engine()
+        if seed is None:
+            rng = reg.default_random_engine()
+        else:
+            rng = reg.default_random_engine(seed)
         data = reg.data_container(X.shape[1])
 
         for i, (mn,mx) in enumerate(pcs):
@@ -155,7 +158,10 @@ class fANOVA(object):
         self.trees_total_variances = []
         # dict of lists where the keys are tuples of the dimensions
         # and the value list contains \hat{f}_U for the individual trees
-        self.V_U = {}
+        # reset all the variance fractions computed
+        self.trees_variance_fractions = {}
+        self.V_U_total = {}
+        self.V_U_individual = {}
 
         self.cutoffs = cutoffs
         self.set_cutoffs(cutoffs)
@@ -178,7 +184,8 @@ class fANOVA(object):
         
         # reset all the variance fractions computed
         self.trees_variance_fractions = {}
-        self.V_U = {}
+        self.V_U_total = {}
+        self.V_U_individual = {}
         
         # recompute the trees' total variance
         self.trees_total_variance = self.the_forest.get_trees_total_variances();
@@ -197,25 +204,24 @@ class fANOVA(object):
         dimensions = tuple(dimensions)
 
         # check if values has been previously computed
-        if dimensions in self.V_U:
+        if dimensions in self.V_U_individual:
             return
         
         # otherwise make sure all lower order marginals have been
         # computed, if not compute them
         for k in range(1,len(dimensions)):
             for sub_dims in it.combinations(dimensions, k):
-                if sub_dims not in self.V_U:
+                if sub_dims not in self.V_U_total:
                     self.__compute_marginals(sub_dims)
         
+
         # now all lower order terms have been computed
-        # and this combination's \hat{f}_U
-        
-        self.V_U[dimensions] = []
+        self.V_U_individual[dimensions] = []
+        self.V_U_total[dimensions] = []
         for tree_idx in range(len(self.all_midpoints)):
             # collect all the midpoints and corresponding sizes for that tree
             midpoints = [self.all_midpoints[tree_idx][dim] for dim in dimensions]
             sizes     = [self.all_sizes[tree_idx][dim]     for dim in dimensions]
-            
             stat = pyrfr.util.weighted_running_stats()
 
             prod_midpoints = it.product(*midpoints)
@@ -226,17 +232,28 @@ class fANOVA(object):
             # make prediction for all midpoints and weigh them by the corresponding size
             for i, (m, s) in enumerate(zip(prod_midpoints, prod_sizes)):
                 sample[list(dimensions)] = list(m)
-                marg = self.the_forest.marginal_mean_prediction_of_tree(tree_idx, sample.tolist())
-                stat.push( marg, np.prod(np.array(s)) )
-
+                ls = self.the_forest.marginal_prediction_stat_of_tree(tree_idx, sample.tolist())
+                print(sample, ls.mean())
+                if not np.isnan(ls.mean()):
+                    stat.push( ls.mean(), np.prod(np.array(s)) * ls.sum_of_weights())
             
             # line 10 in algorithm 2
-            V_U = stat.variance_population();
-            for k in range(1,len(dimensions)):
-                for sub_dims in it.combinations(dimensions, k):
-                    V_U -= self.V_U[sub_dims][tree_idx]
+            # note that V_U^2 can be computed by var(\hat a)^2 - \sum_{subU} var(f_subU)^2
+            # which is why, \hat{f} is never computed in the code, but
+            # appears in the pseudocode
+            V_U_total = np.nan
+            V_U_individual = np.nan
+            
+            if stat.sum_of_weights() > 0:
+                V_U_total = stat.variance_population()
+                V_U_individual = stat.variance_population()
+                for k in range(1,len(dimensions)):
+                    for sub_dims in it.combinations(dimensions, k):
+                        V_U_individual -= self.V_U_individual[sub_dims][tree_idx]
+                V_U_individual = np.clip(V_U_individual, 0, np.inf)
 
-            self.V_U[dimensions].append(V_U)
+            self.V_U_individual[dimensions].append(V_U_individual)
+            self.V_U_total[dimensions].append(V_U_total)
 
     def quantify_importance(self, dimensions):
         
@@ -248,18 +265,12 @@ class fANOVA(object):
         for k in range(1, len(dimensions)+1):
             for sub_dims in it.combinations(dimensions, k):
                 importance_dict[sub_dims] = {}
-                fractions = [self.V_U[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)]
-                #print(sub_dims, fractions)
+                fractions_total = [self.V_U_total[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)]
+                fractions_individual = [self.V_U_individual[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)]
                 # TODO: clean NANs here and catch zero variance in a tree!
-                importance_dict[sub_dims]['individual importance'] = np.mean(fractions)
                 
-                
-                importance_dict[sub_dims]['total importance'] = 0
-                if k == 1:
-                    importance_dict[sub_dims]['total importance'] = importance_dict[sub_dims]['individual importance']
-                else:
-                    for sub_sub_dims in it.combinations(sub_dims, k-1):
-                        importance_dict[sub_dims]['total importance']  += importance_dict[sub_sub_dims]['total importance'] 
+                importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual)
+                importance_dict[sub_dims]['total importance'] = np.mean(fractions_total)
                 
         return(importance_dict)
         
