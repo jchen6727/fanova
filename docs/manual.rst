@@ -49,7 +49,7 @@ Furthermore fANOVA now supports cutoffs on the y values. These will exclude part
 
 You can also specify the number of trees in the random forest as well as the minimum number of points to make a new split in a tree or your already specified configuration space by:
 
-	>>> f = Fanova(X,Y, cs=config_space num_trees=30, min_samples_split=3)
+	>>> f = Fanova(X,Y, config_space=config_space, num_trees=30, min_samples_split=3)
 
 More functions
 --------------
