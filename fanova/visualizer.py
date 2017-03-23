@@ -131,7 +131,7 @@ class Visualizer(object):
         else:
             return plt
 
-    def generate_marginal(self, param, resoluton=100):
+    def generate_marginal(self, param, resolution=100):
         """
         Creates marginals of a selected parameter for own plots
         
@@ -161,7 +161,7 @@ class Visualizer(object):
             mean[i] = m
             std[i] = np.sqrt(v)
 
-        return mean, std
+        return mean, std, grid
 
     def plot_marginal(self, param, resolution=100, log_scale=False, show=True):
         """
@@ -185,7 +185,7 @@ class Visualizer(object):
         upper_bound = self.cs_params[param].upper
         param_name = self.cs_params[param].name
 
-        mean, std = self.generate_marginal(param, resolution)
+        mean, std, grid = self.generate_marginal(param, resolution)
         mean = np.asarray(mean)
         std = np.asarray(std)
         
