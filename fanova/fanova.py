@@ -181,8 +181,9 @@ class fANOVA(object):
             Functions of Dependent Variables" by Hooker.
         """
         if not (quantile is None):
-            percentile = self.percentiles[quantile]
-            self.the_forest.set_cutoffs(-percentile, percentile)
+            percentile1 = self.percentiles[quantile[0]]
+            percentile2 = self.percentiles[quantile[1]]
+            self.the_forest.set_cutoffs(percentile1, percentile2)
         else:
             
             self.cutoffs = cutoffs
@@ -322,7 +323,7 @@ class fANOVA(object):
         pairwise_marginals = []
         dimensions = range(self.n_dims)
         for combi in it.combinations(dimensions,2):
-            pairwise_marginal_performance = self.get_marginal(combi)
+            pairwise_marginal_performance = self.quantify_importance(combi)
             pairwise_marginals.append((pairwise_marginal_performance, combi[0], combi[1]))
         
         pairwise_marginal_performance = sorted(pairwise_marginals, reverse=True)
