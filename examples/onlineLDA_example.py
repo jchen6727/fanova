@@ -9,19 +9,8 @@ import os
 path = os.path.dirname(os.path.realpath(__file__))
 
 # get sample data from online lda
-data = np.loadtxt(path + '/example_data/online_lda/uniq_configurations-it2.csv', delimiter=",")
-X = data[:,1:]
-
-# get responses
-y = []
-with open(path + '/example_data/online_lda/runs_and_results-it2.csv', 'r') as csvfile:
-    csvreader = csv.reader(csvfile)
-    # skip first row
-    next(csvreader)
-    for row in csvreader:
-        y.append(row[10])
-# Note: the random forest needs type float
-Y = np.array([float(i) for i in y[:len(X)]])
+X = np.loadtxt(path + '/example_data/online_lda/online_lda_features.csv', delimiter=",")
+Y = np.loadtxt(path + '/example_data/online_lda/online_lda_responses.csv', delimiter=",")
 
 # setting up config space:
 param_file = path + '/example_data/online_lda/param-file.txt'
@@ -35,7 +24,7 @@ param = cs.get_hyperparameters()
 f = fanova.fANOVA(X = X, Y = Y)
 
 # marginal for first parameter
-p_list = [0]
+p_list = (0, )
 res = f.quantify_importance(p_list)
 print(res)
 
@@ -49,5 +38,8 @@ print(best_margs)
 plot_dir = path + '/example_data/test_plots'
 # first create an instance of the visualizer with fanova object and configspace
 vis = visualizer.Visualizer(f, cs)
+# generating plot data for col0
+mean, std, grid = vis.generate_marginal(0)
+print(mean)
 # creating all plots in the directory
 vis.create_all_plots(plot_dir)
