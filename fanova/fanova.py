@@ -89,7 +89,6 @@ class fANOVA(object):
             else:
                 pcs[i] = (hp.lower, hp.upper)
 
-        print(pcs)
         # set forest options
         forest = reg.fanova_forest()
         forest.options.num_trees = n_trees
@@ -108,7 +107,7 @@ class fANOVA(object):
             rng = reg.default_random_engine()
         else:
             rng = reg.default_random_engine(seed)
-        data = reg.data_container(X.shape[1])
+        data = reg.default_data_container(X.shape[1])
 
         for i, (mn,mx) in enumerate(pcs):
             if(np.isnan(mx)):
@@ -142,8 +141,16 @@ class fANOVA(object):
             midpoints =  []
             for i, split_vals in enumerate(tree_split_values):
                 if np.isnan(pcs[i][1]): # categorical parameter
-                    midpoints.append(split_vals)
-                    sizes.append( np.ones(len(split_vals)))
+                    # check if the tree actually splits on this parameter
+                    if len(split_vals) > 0:
+                        midpoints.append(split_vals)
+                        sizes.append( np.ones(len(split_vals)))
+                    # if not, simply append 0 as the value with the number
+                    # of categories as the size, that way this parameter will
+                    # get 0 importance from this tree.
+                    else:
+                        midpoints.append((0,))
+                        sizes.append((pcs[i][0],))
                 else:
                     # add bounds to split values
                     sv = np.array([pcs[i][0]] + list(split_vals) + [pcs[i][1]])
@@ -240,7 +247,7 @@ class fANOVA(object):
             for i, (m, s) in enumerate(zip(prod_midpoints, prod_sizes)):
                 sample[list(dimensions)] = list(m)
                 ls = self.the_forest.marginal_prediction_stat_of_tree(tree_idx, sample.tolist())
-                print(sample, ls.mean())
+                #print(sample, ls.mean())
                 if not np.isnan(ls.mean()):
                     stat.push( ls.mean(), np.prod(np.array(s)) * ls.sum_of_weights())
             
@@ -272,12 +279,12 @@ class fANOVA(object):
         for k in range(1, len(dimensions)+1):
             for sub_dims in it.combinations(dimensions, k):
                 importance_dict[sub_dims] = {}
-                fractions_total = [self.V_U_total[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)]
-                fractions_individual = [self.V_U_individual[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)]
-                # TODO: clean NANs here and catch zero variance in a tree!
-                
-                importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual)
-                importance_dict[sub_dims]['total importance'] = np.mean(fractions_total)
+                fractions_total = np.array([self.V_U_total[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)])
+                fractions_individual = np.array([self.V_U_individual[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)])
+                # clean NANs here to catch zero variance in a trees
+                indices = np.logical_and(~np.isnan(fractions_individual), ~np.isnan(fractions_total))
+                importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual[indices])
+                importance_dict[sub_dims]['total importance'] = np.mean(fractions_total[indices])
                 
         return(importance_dict)
         
