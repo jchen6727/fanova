@@ -73,7 +73,7 @@ We can then plot single marginals by
 
 what should look like this
 
-.. image:: ../../fanova/examples/example_data/online_lda/Col1.png
+.. image:: /../examples/example_data/online_lda/Col1.png
 
 NOTE: For categorical values use the function plot_categorical_marginal(parameter) instead.
 
@@ -81,7 +81,7 @@ The same can been done for pairwise marginals
 
     >>> vis.plot_pairwise_marginal("Col0", "Col2")
 
-.. image:: ../../fanova/examples/example_data/online_lda/pairwise.png
+.. image:: /../examples/example_data/online_lda/pairwise.png
 
 
 If you are just interested in the N most important pairwise marginals you can plot them through:
