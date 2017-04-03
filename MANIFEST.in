@@ -1,2 +1,1 @@
-recursive-include pyfanova/fanova *.jar
 include Readme.rst
