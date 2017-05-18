@@ -2,8 +2,8 @@ import numpy as np
 from smac.configspace import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 import csv
-import fanova
-import visualizer
+from fanova import fANOVA
+import fanova.visualizer
 
 import os
 path = os.path.dirname(os.path.realpath(__file__))
@@ -21,7 +21,7 @@ for row in f:
 param = cs.get_hyperparameters()
 
 # create an instance of fanova with data for the random forest and the configSpace
-f = fanova.fANOVA(X = X, Y = Y)
+f = fANOVA(X = X, Y = Y)
 
 # marginal for first parameter
 p_list = (0, )

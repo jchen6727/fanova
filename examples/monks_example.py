@@ -3,8 +3,8 @@ import urllib
 from smac.configspace import ConfigurationSpace
 from ConfigSpace.hyperparameters import CategoricalHyperparameter
 
-import fanova
-import visualizer 
+from fanova import fANOVA
+import fanova.visualizer 
 import os
 path = os.path.dirname(os.path.realpath(__file__))
 

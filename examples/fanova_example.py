@@ -1,7 +1,7 @@
 import numpy as np
 
-import fanova
-import fanova.visualizer as visualizer
+from fanova import fANOVA
+import fanova.visualizer
 
 import ConfigSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter
@@ -24,7 +24,7 @@ for i in range(len(pcs)):
 
 
 # create an instance of fanova with trained forest and ConfigSpace
-f = fanova.fANOVA(X = features, Y = responses, cs=cs)
+f = fANOVA(X = features, Y = responses, config_space=cs)
 
 # marginal of particular parameter:
 dims = list([1])
