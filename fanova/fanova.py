@@ -67,7 +67,7 @@ class fANOVA(object):
             raise RuntimeError('Number of parameters in ConfigSpace object does not match input X')
         for i in range(len(self.cs_params)):
             if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
-                if (np.max(X[:,i]) > self.cs_params[i].upper) or (np.min(X[:,i]) > self.cs_params[i].lower):
+                if np.any(X[:,i] > self.cs_params[i].upper) or np.any(X[:,i] < self.cs_params[i].lower):
                     raise RuntimeError('Some sample values from X are not in the given interval')
             else:
                 unique_vals = set(X[:,i])
@@ -92,10 +92,9 @@ class fANOVA(object):
         # set forest options
         forest = reg.fanova_forest()
         forest.options.num_trees = n_trees
-        forest.options.seed = np.random.randint(2**31-1) if seed is None else seed
         forest.options.do_bootstrapping = bootstrapping
         forest.options.num_data_points_per_tree = X.shape[0] if points_per_tree is None else points_per_tree
-        forest.options.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
+        forest.options.tree_opts.max_features = (X.shape[1]*7)//10 if max_features is None else max_features
 
         forest.options.tree_opts.min_samples_to_split = min_samples_split
         forest.options.tree_opts.min_samples_in_leaf = min_samples_leaf
@@ -104,7 +103,7 @@ class fANOVA(object):
 
         # create data conatainer and provide all the necessary information
         if seed is None:
-            rng = reg.default_random_engine()
+            rng = reg.default_random_engine( np.random.randint(2**31-1))
         else:
             rng = reg.default_random_engine(seed)
         data = reg.default_data_container(X.shape[1])
