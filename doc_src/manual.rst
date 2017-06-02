@@ -57,7 +57,12 @@ More functions
 
     Computes the mean and standard deviation of the parameter (or parameterlist) **p** for a certain value **v**
 
+pysmac
+-------
+In order to run fANOVA on pysmac output:
 
+    >>> import pysmac.utils.pysmac_fanova as pysmac_fanova
+    >>> fanova = pysmac_fanova.smac_to_fanova('path_to/pysmac_output_dir/out/scenario')
 
 Visualization
 -------------
@@ -100,6 +105,7 @@ The same for generate_pairwise_marginal([0,2]) and get_categorical_marginal().
 At last, all plots can be created together and stored in a directory with
 
     >>> vis.create_all_plots("./plots/")
+
 
 
 How to load a CSV-file
