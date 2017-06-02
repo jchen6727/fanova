@@ -37,7 +37,7 @@ print(best_margs)
 # directory in which you can find all plots
 plot_dir = path + '/example_data/test_plots'
 # first create an instance of the visualizer with fanova object and configspace
-vis = visualizer.Visualizer(f, cs)
+vis = fanova.visualizer.Visualizer(f, cs)
 # generating plot data for col0
 mean, std, grid = vis.generate_marginal(0)
 print(mean)

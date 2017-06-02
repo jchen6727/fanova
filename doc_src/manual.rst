@@ -65,7 +65,7 @@ Visualization
 To visualize the single and pairwise marginals, we have to create a visualizer object first containing the fanova object and configspace
 
     >>> import fanova.visualizer
-    >>> vis = visualizer.Visualizer(f, config_space)
+    >>> vis = fanova.visualizer.Visualizer(f, config_space)
 
 We can then plot single marginals by 
 

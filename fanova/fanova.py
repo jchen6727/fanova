@@ -326,13 +326,20 @@ class fANOVA(object):
         list: 
              Contains the n most important pairwise marginals
         """
+        tot_imp_dict = OrderedDict()
         pairwise_marginals = []
         dimensions = range(self.n_dims)
         for combi in it.combinations(dimensions,2):
+
             pairwise_marginal_performance = self.quantify_importance(combi)
-            pairwise_marginals.append((pairwise_marginal_performance, combi[0], combi[1]))
+            tot_imp = pairwise_marginal_performance[combi]['total importance']
+            pairwise_marginals.append((tot_imp, combi[0], combi[1]))
         
         pairwise_marginal_performance = sorted(pairwise_marginals, reverse=True)
-        important_pairwise_marginals = [(p1, p2) for marginal, p1, p2  in pairwise_marginal_performance[:n]]
 
-        return important_pairwise_marginals
+        #important_pairwise_marginals = [((p1, p2), marginal) for marginal, p1, p2  in pairwise_marginal_performance[:n]]
+
+        for marginal, p1, p2  in pairwise_marginal_performance[:n]:
+            tot_imp_dict[(p1,p2)] = marginal
+
+        return tot_imp_dict
