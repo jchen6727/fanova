@@ -27,7 +27,7 @@ for i in range(len(pcs)):
 f = fANOVA(X = features, Y = responses, config_space=cs)
 
 # marginal of particular parameter:
-dims = list([1])
+dims = (1, )
 res = f.quantify_importance(dims)
 print(res)
 
@@ -39,6 +39,6 @@ print(best_margs)
 # first create an instance of the visualizer with fanova object and configspace
 vis = visualizer.Visualizer(f, cs)
 # creating the plot of pairwise marginal:
-vis.plot_pairwise_marginal(list([0,2]), resolution=20)
+vis.plot_pairwise_marginal((0,2), resolution=20)
 # creating all plots in the directory
 vis.create_all_plots(plot_dir)
