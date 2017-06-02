@@ -215,7 +215,7 @@ class fANOVA(object):
                 (starts with 0) 
         """        
         dimensions = tuple(dimensions)
-
+        
         # check if values has been previously computed
         if dimensions in self.V_U_individual:
             return
@@ -268,22 +268,40 @@ class fANOVA(object):
             self.V_U_individual[dimensions].append(V_U_individual)
             self.V_U_total[dimensions].append(V_U_total)
 
-    def quantify_importance(self, dimensions):
-        
+    def quantify_importance(self, dims):
+        if type(dims[0]) == str:
+            idx = []
+            for i, param in enumerate(dims):
+                idx.append(self.cs.get_idx_by_hyperparameter_name(param))
+            dimensions = idx
         # make sure that all the V_U values are computed for each tree
+        else:
+            dimensions = dims
+        
         self.__compute_marginals(dimensions)
         
         importance_dict = {}
         
         for k in range(1, len(dimensions)+1):
             for sub_dims in it.combinations(dimensions, k):
-                importance_dict[sub_dims] = {}
+                if type(dims[0]) == str:
+                    dim_names =[]
+                    for j, dim in enumerate(sub_dims):
+                        dim_names.append(self.cs.get_hyperparameter_by_idx(dim))
+                    dim_names = tuple(dim_names)
+                    importance_dict[dim_names] = {}
+                else:
+                    importance_dict[sub_dims] = {}
                 fractions_total = np.array([self.V_U_total[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)])
                 fractions_individual = np.array([self.V_U_individual[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)])
                 # clean NANs here to catch zero variance in a trees
                 indices = np.logical_and(~np.isnan(fractions_individual), ~np.isnan(fractions_total))
-                importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual[indices])
-                importance_dict[sub_dims]['total importance'] = np.mean(fractions_total[indices])
+                if type(dims[0]) == str:
+                    importance_dict[dim_names]['individual importance'] = np.mean(fractions_individual[indices])
+                    importance_dict[dim_names]['total importance'] = np.mean(fractions_total[indices])
+                else:
+                    importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual[indices])
+                    importance_dict[sub_dims]['total importance'] = np.mean(fractions_total[indices])
                 
         return(importance_dict)
         
