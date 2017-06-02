@@ -62,7 +62,7 @@ pysmac
 In order to run fANOVA on pysmac output:
 
     >>> import pysmac.utils.pysmac_fanova as pysmac_fanova
-    >>> fanova = pysmac_fanova.smac_to_fanova('path_to/pysmac_output_dir/out/scenario')
+    >>> fanova = pysmac_fanova.smac_to_fanova('path_to/pysmac_output_dir/out/scenario', 'path_to/merged_states')
 
 Visualization
 -------------
