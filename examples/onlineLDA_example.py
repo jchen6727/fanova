@@ -47,3 +47,4 @@ mean, std, grid = vis.generate_marginal(0)
 print(mean)
 # creating all plots in the directory
 vis.create_all_plots(plot_dir)
+#vis.create_most_important_pairwise_marginal_plots(plot_dir, 3)
