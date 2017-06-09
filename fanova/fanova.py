@@ -12,7 +12,8 @@ class fANOVA(object):
                 n_trees=16, seed=None, bootstrapping=True,
                 points_per_tree = None, max_features=None,
                 min_samples_split=0, min_samples_leaf=0,
-                max_depth=64, cutoffs= (-np.inf, np.inf)):
+                max_depth=64, cutoffs= (-np.inf, np.inf), 
+                config_on_hypercube=False):
 
         """
         Calculate and provide midpoints and sizes from the forest's 
@@ -67,27 +68,31 @@ class fANOVA(object):
             raise RuntimeError('Number of parameters in ConfigSpace object does not match input X')
         for i in range(len(self.cs_params)):
             if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
-                if np.any(X[:,i] > self.cs_params[i].upper) or np.any(X[:,i] < self.cs_params[i].lower):
-                    raise RuntimeError('Some sample values from X are not in the given interval')
+                if not config_on_hypercube:
+                    if (abs(np.max(X[:, i])) > abs(self.cs_params[i].upper)) or \
+                            (abs(np.min(X[:, i])) < abs(self.cs_params[i].lower)):
+                        raise RuntimeError('Some sample values from X are not in the given interval')
+                else:
+                    if (np.max(X[:, i]) > 1.) or (np.min(X[:, i]) < 0.):
+                        raise RuntimeError('Some sample values from X are not sampled on the hypercube')
             else:
-                unique_vals = set(X[:,i])
+                unique_vals = set(X[:, i])
                 if len(unique_vals) > self.cs_params[i]._num_choices:
                     raise RuntimeError('There are some categoricals missing in the ConfigSpace specification')
-                if len(unique_vals) < self.cs_params[i]._num_choices:
-                    raise RuntimeError('There are too many categoricals specified in the ConfigSpace')
-
-
 
         # initialize all types as 0
         types = np.zeros(len(self.cs_params), dtype=np.uint)
         # retrieve the types and the bounds from the ConfigSpace 
         # TODO: Test if that actually works
         for i, hp in enumerate(self.cs_params):
-            if isinstance( hp , CategoricalHyperparameter):
+            if isinstance(hp, CategoricalHyperparameter):
                 types[i] = len(hp.choices)
                 pcs[i] = (len(hp.choices), np.nan)
             else:
-                pcs[i] = (hp.lower, hp.upper)
+                if config_on_hypercube:
+                    pcs[i] = (0., 1.)
+                else:
+                    pcs[i] = (hp.lower, hp.upper)
 
         # set forest options
         forest = reg.fanova_forest()
