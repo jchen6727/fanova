@@ -1,6 +1,7 @@
 from ConfigSpace.hyperparameters import CategoricalHyperparameter
 import os
 import numpy as np
+
 import matplotlib.pyplot as plt
 import itertools as it
 from matplotlib import cm
@@ -266,46 +267,6 @@ class Visualizer(object):
         else:
             return plt
             
-    def plot_pairwise_categorical_marginal(self, param_list, show=True):
-        """
-        Creates a plot of marginal of a selected categorical parameter
-        
-        Parameters
-        ------------
-        param_list: list of ints or strings
-            Contains the selected categorical parameters
-        
-        """
-        if type(param) == str:
-            param = self.cs.get_idx_by_hyperparameter_name(param)
-        param_name = self.cs_params[param].name
-        labels= self.cs_params[param].choices
-        categorical_size  = self.cs_params[param]._num_choices
-
-        mean, std = self.get_categorical_marginal(param)
-        indices = np.arange(1,categorical_size+1, 1)
-        b = plt.boxplot([[x] for x in mean])
-        plt.xticks(indices, labels)
-        min_y = mean[0]
-        max_y = mean[0]
-        # blow up boxes 
-        for box, std_ in zip(b["boxes"], std):
-            y = box.get_ydata()
-            y[2:4] = y[2:4] + std_
-            y[0:2] = y[0:2] - std_
-            y[4] = y[4] - std_
-            box.set_ydata(y)
-            min_y = min(min_y, y[0] - std_)
-            max_y = max(max_y, y[2] + std_)
-        
-        plt.ylim([min_y, max_y])
-        
-        plt.ylabel("Performance")
-        plt.xlabel(param_name)
-        if show:
-            plt.show()
-        else:
-            return plt
         
     def create_most_important_pairwise_marginal_plots(self, directory, n=20):
         """
