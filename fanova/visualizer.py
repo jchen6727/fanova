@@ -17,7 +17,8 @@ class Visualizer(object):
         
         forest: trained random forest        
         """
-        self.fanova = fanova   
+        self.fanova = fanova
+        self.cs = cs
         self.cs_params = cs.get_hyperparameters()
 
     def create_all_plots(self, directory, **kwargs):
@@ -112,8 +113,6 @@ class Visualizer(object):
         for p in range(len(param_list)):
             if type(p) == str:
                 p = self.cs.get_idx_by_hyperparameter_name(p)
-            lower_bound = self.cs_params[p].lower
-            upper_bound = self.cs_params[p].upper
             param_names.append(self.cs_params[p].name)
         grid_list, zz = self.generate_pairwise_marginal(param_list, resolution)
 
@@ -182,8 +181,6 @@ class Visualizer(object):
         """
         if type(param) == str:
             param = self.cs.get_idx_by_hyperparameter_name(param)
-        lower_bound = self.cs_params[param].lower
-        upper_bound = self.cs_params[param].upper
         param_name = self.cs_params[param].name
 
         mean, std, grid = self.generate_marginal(param, resolution)
