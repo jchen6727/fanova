@@ -1,6 +1,7 @@
 from ConfigSpace.hyperparameters import CategoricalHyperparameter
 import os
 import numpy as np
+import warnings
 
 import matplotlib.pyplot as plt
 import itertools as it
@@ -281,9 +282,14 @@ class Visualizer(object):
         most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(n)
         print(most_important_pairwise_marginals)
         for param1, param2 in most_important_pairwise_marginals:
-            param_names = [self.cs_params[param1].name, self.cs_params[param2].name]
-            outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_") + ".png")
-            plt.clf()
-            print("creating %s" % outfile_name)
-            self.plot_pairwise_marginal([param1, param2], show=False)
-            plt.savefig(outfile_name)
+            if isinstance(self.cs_params[param1], CategoricalHyperparameter) or isinstance(self.cs_params[param2], CategoricalHyperparameter):
+                warnings.warn("The pair (%s,%s) consists of at least one categorical hyperparameter."
+                              "Therefore no pairwise plot available for this case." 
+                              %(self.cs_params[param1].name, self.cs_params[param2].name))
+            else:
+                param_names = [self.cs_params[param1].name, self.cs_params[param2].name]
+                outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_") + ".png")
+                plt.clf()
+                print("creating %s" % outfile_name)
+                self.plot_pairwise_marginal([param1, param2], show=False)
+                plt.savefig(outfile_name)
