@@ -61,6 +61,7 @@ class fANOVA(object):
         self.cs_params =self.cs.get_hyperparameters()
         self.n_dims = len(self.cs_params)
         self.n_trees = n_trees
+        self.config_on_hypercube = config_on_hypercube
 
         # at this point we have a valid ConfigSpace object
         # check if param number is correct etc:
@@ -68,7 +69,7 @@ class fANOVA(object):
             raise RuntimeError('Number of parameters in ConfigSpace object does not match input X')
         for i in range(len(self.cs_params)):
             if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
-                if not config_on_hypercube:
+                if not self.config_on_hypercube:
                     if (abs(np.max(X[:, i])) > abs(self.cs_params[i].upper)) or \
                             (abs(np.min(X[:, i])) < abs(self.cs_params[i].lower)):
                         raise RuntimeError('Some sample values from X are not in the given interval')
