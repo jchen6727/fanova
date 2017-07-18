@@ -69,8 +69,8 @@ class fANOVA(object):
         for i in range(len(self.cs_params)):
             if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
                 if not config_on_hypercube:
-                    if (abs(np.max(X[:, i])) > abs(self.cs_params[i].upper)) or \
-                            (abs(np.min(X[:, i])) < abs(self.cs_params[i].lower)):
+                    if (np.max(X[:, i]) > self.cs_params[i].upper) or \
+                            (np.min(X[:, i]) < self.cs_params[i].lower):
                         raise RuntimeError('Some sample values from X are not in the given interval')
                 else:
                     if (np.max(X[:, i]) > 1.) or (np.min(X[:, i]) < 0.):
@@ -120,7 +120,7 @@ class fANOVA(object):
                 data.set_bounds_of_feature(i, mn, mx)
 
         for i in range(len(Y)):
-            data.add_data_point(X[i],Y[i])
+            data.add_data_point(X[i].tolist(),Y[i])
         
         forest.fit(data, rng)
 
