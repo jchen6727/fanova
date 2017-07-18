@@ -85,6 +85,8 @@ class Visualizer(object):
             upper_bound = self.cs_params[p].upper
             param_names.append(self.cs_params[p].name)
             grid = np.linspace(lower_bound, upper_bound, resolution)
+            if self.fanova.config_on_hypercube:
+                grid = self.cs_params[p]._transform(grid)
             grid_list.append(grid)
 
         zz = np.zeros([resolution * resolution])
@@ -152,7 +154,8 @@ class Visualizer(object):
         upper_bound = self.cs_params[param].upper
         param_name = self.cs_params[param].name
         grid = np.linspace(lower_bound, upper_bound, resolution)
-      
+        if self.fanova.config_on_hypercube:
+                grid = self.cs_params[param]._transform(grid)
         mean = np.zeros(resolution)
         std = np.zeros(resolution)
 
