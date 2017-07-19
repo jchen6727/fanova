@@ -167,7 +167,7 @@ class Visualizer(object):
 
         return mean, std, grid
 
-    def plot_marginal(self, param, resolution=100, log_scale=False, show=True):
+    def plot_marginal(self, param, resolution=100, log_scale=None, show=True):
         """
         Creates a plot of marginal of a selected parameter
         
@@ -181,11 +181,15 @@ class Visualizer(object):
             values to predict
         
         log_scale: boolean
-            If log scale is required or not
+            If log scale is required or not. If no value is given, it is
+            deduced from the ConfigSpace provided
         """
         if type(param) == str:
             param = self.cs.get_idx_by_hyperparameter_name(param)
         param_name = self.cs_params[param].name
+
+        if log_scale is None:
+            log_scale = self.cs_params[param].log
 
         mean, std, grid = self.generate_marginal(param, resolution)
         mean = np.asarray(mean)
