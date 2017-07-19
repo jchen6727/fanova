@@ -60,7 +60,7 @@ class Visualizer(object):
             self.plot_pairwise_marginal(combi, **kwargs)
             plt.savefig(outfile_name)
 
-    def generate_pairwise_marginal(self, param_list, resolution=20):
+    def generate_pairwise_marginal(self, param_indices, resolution=20):
         """
         Creates a plot of pairwise marginal of a selected parameters
         
@@ -74,13 +74,13 @@ class Visualizer(object):
             values to predict
 
         """
-        assert len(param_list) == 2, "You have to specify 2 (different) parameters"
+        assert len(param_indices) == 2, "You have to specify 2 (different) parameters"
         
         grid_list = []
         param_names = []
-        for p in range(len(param_list)):
-            if type(p) == str:
-                p = self.cs.get_idx_by_hyperparameter_name(p)
+
+                
+        for p in param_indices:
             lower_bound = self.cs_params[p].lower
             upper_bound = self.cs_params[p].upper
             param_names.append(self.cs_params[p].name)
@@ -92,7 +92,7 @@ class Visualizer(object):
         zz = np.zeros([resolution * resolution])
         for i, y_value in enumerate(grid_list[1]):
             for j, x_value in enumerate(grid_list[0]):
-                zz[i * resolution + j] = self.fanova.marginal_mean_variance_for_values(param_list, [x_value, y_value])[0]
+                zz[i * resolution + j] = self.fanova.marginal_mean_variance_for_values(param_indices, [x_value, y_value])[0]
 
         zz = np.reshape(zz, [resolution, resolution])
 
@@ -112,12 +112,18 @@ class Visualizer(object):
             values to predict
 
         """
+        assert len(param_list) == 2, "You have to specify 2 (different) parameters"
         param_names = []
-        for p in range(len(param_list)):
+        param_indices= []
+        
+        for p in param_list:
             if type(p) == str:
                 p = self.cs.get_idx_by_hyperparameter_name(p)
             param_names.append(self.cs_params[p].name)
-        grid_list, zz = self.generate_pairwise_marginal(param_list, resolution)
+            param_indices.append(p)
+        print(param_names)
+
+        grid_list, zz = self.generate_pairwise_marginal(param_indices, resolution)
 
         display_xx, display_yy = np.meshgrid(grid_list[0], grid_list[1])
 
