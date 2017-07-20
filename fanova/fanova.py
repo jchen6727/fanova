@@ -298,16 +298,20 @@ class fANOVA(object):
                     importance_dict[dim_names] = {}
                 else:
                     importance_dict[sub_dims] = {}
-                fractions_total = np.array([self.V_U_total[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)])
-                fractions_individual = np.array([self.V_U_individual[sub_dims][t]/self.trees_total_variance[t] for t in range(self.n_trees)])
-                # clean NANs here to catch zero variance in a trees
-                indices = np.logical_and(~np.isnan(fractions_individual), ~np.isnan(fractions_total))
+                # clean here to catch zero variance in a trees
+                non_zero_idx = np.nonzero([self.trees_total_variance[t] for t in range(self.n_trees)])
+                if len(non_zero_idx[0]) == 0:
+                    raise RuntimeError('Encountered zero total variance in all trees.')
+
+                fractions_total = np.array([self.V_U_total[sub_dims][t]/self.trees_total_variance[t] for t in non_zero_idx[0]])
+                fractions_individual = np.array([self.V_U_individual[sub_dims][t]/self.trees_total_variance[t] for t in non_zero_idx[0]])
+
                 if type(dims[0]) == str:
-                    importance_dict[dim_names]['individual importance'] = np.mean(fractions_individual[indices])
-                    importance_dict[dim_names]['total importance'] = np.mean(fractions_total[indices])
+                    importance_dict[dim_names]['individual importance'] = np.mean(fractions_individual)
+                    importance_dict[dim_names]['total importance'] = np.mean(fractions_total)
                 else:
-                    importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual[indices])
-                    importance_dict[sub_dims]['total importance'] = np.mean(fractions_total[indices])
+                    importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual)
+                    importance_dict[sub_dims]['total importance'] = np.mean(fractions_total)
                 
         return(importance_dict)
         

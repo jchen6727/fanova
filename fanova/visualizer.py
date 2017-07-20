@@ -121,7 +121,7 @@ class Visualizer(object):
                 p = self.cs.get_idx_by_hyperparameter_name(p)
             param_names.append(self.cs_params[p].name)
             param_indices.append(p)
-        print(param_names)
+
 
         grid_list, zz = self.generate_pairwise_marginal(param_indices, resolution)
 
@@ -293,7 +293,6 @@ class Visualizer(object):
             
         """
         most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(n)
-        print(most_important_pairwise_marginals)
         for param1, param2 in most_important_pairwise_marginals:
             if isinstance(self.cs_params[param1], CategoricalHyperparameter) or isinstance(self.cs_params[param2], CategoricalHyperparameter):
                 warnings.warn("The pair (%s,%s) consists of at least one categorical hyperparameter."
