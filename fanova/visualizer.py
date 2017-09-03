@@ -159,9 +159,14 @@ class Visualizer(object):
         lower_bound = self.cs_params[param].lower
         upper_bound = self.cs_params[param].upper
         param_name = self.cs_params[param].name
-        grid = np.linspace(lower_bound, upper_bound, resolution)
+        log = self.cs_params[param].log
+        if log:
+            # JvR: my conjecture is that ConfigSpace uses the natural logarithm
+            grid = np.logspace(lower_bound, upper_bound, resolution, endpoint=True, base=np.e)
+        else:
+            grid = np.linspace(lower_bound, upper_bound, resolution)
         if self.fanova.config_on_hypercube:
-                grid = self.cs_params[param]._transform(grid)
+            grid = self.cs_params[param]._transform(grid)
         mean = np.zeros(resolution)
         std = np.zeros(resolution)
 
