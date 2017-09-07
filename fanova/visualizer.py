@@ -162,7 +162,14 @@ class Visualizer(object):
         log = self.cs_params[param].log
         if log:
             # JvR: my conjecture is that ConfigSpace uses the natural logarithm
-            grid = np.logspace(lower_bound, upper_bound, resolution, endpoint=True, base=np.e)
+            base = np.e
+            log_lower = np.log(min) / np.log(base)
+            log_upper = np.log(max) / np.log(base)
+            grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
+            if abs(grid[0] - min) > 0.00001:
+                raise ValueError()
+            if abs(grid[-1] - max) > 0.00001:
+                raise ValueError()
         else:
             grid = np.linspace(lower_bound, upper_bound, resolution)
         if self.fanova.config_on_hypercube:
