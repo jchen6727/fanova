@@ -163,12 +163,12 @@ class Visualizer(object):
         if log:
             # JvR: my conjecture is that ConfigSpace uses the natural logarithm
             base = np.e
-            log_lower = np.log(min) / np.log(base)
-            log_upper = np.log(max) / np.log(base)
+            log_lower = np.log(lower_bound) / np.log(base)
+            log_upper = np.log(upper_bound) / np.log(base)
             grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
-            if abs(grid[0] - min) > 0.00001:
+            if abs(grid[0] - lower_bound) > 0.00001:
                 raise ValueError()
-            if abs(grid[-1] - max) > 0.00001:
+            if abs(grid[-1] - upper_bound) > 0.00001:
                 raise ValueError()
         else:
             grid = np.linspace(lower_bound, upper_bound, resolution)
