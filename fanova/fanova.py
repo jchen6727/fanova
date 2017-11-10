@@ -340,7 +340,7 @@ class fANOVA(object):
 
         return self.the_forest.marginal_mean_variance_prediction(sample)
 
-    def get_most_important_pairwise_marginals(self, n=10):
+    def get_most_important_pairwise_marginals(self, params=None, n=10):
         """
         Returns the n most important pairwise marginals from the whole ConfigSpace
             
@@ -356,9 +356,20 @@ class fANOVA(object):
         """
         tot_imp_dict = OrderedDict()
         pairwise_marginals = []
-        dimensions = range(self.n_dims)
-        for combi in it.combinations(dimensions,2):
-
+        if params is None:
+            dimensions = range(self.n_dims)
+        else:
+            if type(params[0]) == str:
+                idx = []
+                for i, param in enumerate(params):
+                    idx.append(self.cs.get_idx_by_hyperparameter_name(param))
+                dimensions = idx
+            else:
+                dimensions = params
+        pairs = it.combinations(dimensions,2)
+        if params:
+            n = len(list(pairs))
+        for combi in pairs:
             pairwise_marginal_performance = self.quantify_importance(combi)
             tot_imp = pairwise_marginal_performance[combi]['total importance']
             pairwise_marginals.append((tot_imp, combi[0], combi[1]))
