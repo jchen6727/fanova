@@ -55,7 +55,7 @@ class Visualizer(object):
             for p in combi:
                 param_names.append(self.cs_params[p].name)
             plt.close()
-            outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_") + ".png")
+            outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
             print("creating %s" % outfile_name)
             self.plot_pairwise_marginal(combi, **kwargs)
             plt.savefig(outfile_name)
@@ -98,7 +98,7 @@ class Visualizer(object):
 
         return grid_list, zz
 
-    def plot_pairwise_marginal(self, param_list, resolution=20, show=True):
+    def plot_pairwise_marginal(self, param_list, resolution=20, show=False):
         """
         Creates a plot of pairwise marginal of a selected parameters
         
@@ -312,7 +312,7 @@ class Visualizer(object):
                               %(self.cs_params[param1].name, self.cs_params[param2].name))
             else:
                 param_names = [self.cs_params[param1].name, self.cs_params[param2].name]
-                outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_") + ".png")
+                outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
                 plt.clf()
                 print("creating %s" % outfile_name)
                 self.plot_pairwise_marginal([param1, param2], show=False)
