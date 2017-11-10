@@ -52,6 +52,10 @@ More functions
 
     Returns the **n** most important pairwise marginals
 
+    * **f.get_most_important_pairwise_marginals(params)**
+
+    Returns the pairwise marginals of all elements in the list.
+
 
     * **fANOVA.marginal_mean_variance_for_values(p, v)**
 
@@ -80,8 +84,6 @@ what should look like this
 
 .. image:: ../examples/example_data/online_lda/Col1.png
 
-NOTE: For categorical values use the function plot_categorical_marginal(parameter) instead.
-
 The same can been done for pairwise marginals
 
     >>> vis.plot_pairwise_marginal([0,2])
@@ -98,8 +100,6 @@ and Fanova will save those plot in dir. However, be aware that to create the plo
 If you're not interested in the plot itself, but want to extract the values for your own plots, simply call
 
     >>> vis.generate_marginal(0)
-
-The same for generate_pairwise_marginal([0,2]) and get_categorical_marginal().
 
 
 At last, all plots can be created together and stored in a directory with
