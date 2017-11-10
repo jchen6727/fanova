@@ -160,7 +160,8 @@ class Visualizer(object):
             labels= self.cs_params[param].choices
             categorical_size  = self.cs_params[param]._num_choices
             marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
-            mean, std = list(zip(*marginals))
+            mean, v = list(zip(*marginals))
+            std = np.sqrt(v)
             return mean, std
             
         else:        
