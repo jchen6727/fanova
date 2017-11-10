@@ -39,10 +39,8 @@ class Visualizer(object):
             plt.close()
             outfile_name = os.path.join(directory, param_name.replace(os.sep, "_") + ".png")
             print("creating %s" % outfile_name)
-            if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
-                self.plot_categorical_marginal(param, show=False)
-            else:
-                self.plot_marginal(param, show=False, **kwargs)
+            
+            self.plot_marginal(param, show=False, **kwargs)
             plt.savefig(outfile_name)
         # additional pairwise plots:
         dimensions = []
@@ -156,34 +154,43 @@ class Visualizer(object):
         """
         if type(param) == str:
             param = self.cs.get_idx_by_hyperparameter_name(param)
-        lower_bound = self.cs_params[param].lower
-        upper_bound = self.cs_params[param].upper
-        param_name = self.cs_params[param].name
-        log = self.cs_params[param].log
-        if log:
-            # JvR: my conjecture is that ConfigSpace uses the natural logarithm
-            base = np.e
-            log_lower = np.log(lower_bound) / np.log(base)
-            log_upper = np.log(upper_bound) / np.log(base)
-            grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
-            if abs(grid[0] - lower_bound) > 0.00001:
-                raise ValueError()
-            if abs(grid[-1] - upper_bound) > 0.00001:
-                raise ValueError()
-        else:
-            grid = np.linspace(lower_bound, upper_bound, resolution)
-        if self.fanova.config_on_hypercube:
-            grid = self.cs_params[param]._transform(grid)
-        mean = np.zeros(resolution)
-        std = np.zeros(resolution)
+        
+        if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
+            param_name = self.cs_params[param].name
+            labels= self.cs_params[param].choices
+            categorical_size  = self.cs_params[param]._num_choices
+            marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
+            mean, std = list(zip(*marginals))
+            return mean, std
+            
+        else:        
+            lower_bound = self.cs_params[param].lower
+            upper_bound = self.cs_params[param].upper
+            log = self.cs_params[param].log
+            if log:
+                # JvR: my conjecture is that ConfigSpace uses the natural logarithm
+                base = np.e
+                log_lower = np.log(lower_bound) / np.log(base)
+                log_upper = np.log(upper_bound) / np.log(base)
+                grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
+                if abs(grid[0] - lower_bound) > 0.00001:
+                    raise ValueError()
+                if abs(grid[-1] - upper_bound) > 0.00001:
+                    raise ValueError()
+            else:
+                grid = np.linspace(lower_bound, upper_bound, resolution)
+            if self.fanova.config_on_hypercube:
+                grid = self.cs_params[param]._transform(grid)
+            mean = np.zeros(resolution)
+            std = np.zeros(resolution)
+    
+            dim = [param]
+            for i in range(0, resolution):
+                (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
+                mean[i] = m
+                std[i] = np.sqrt(v)
 
-        dim = [param]
-        for i in range(0, resolution):
-            (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
-            mean[i] = m
-            std[i] = np.sqrt(v)
-
-        return mean, std, grid
+            return mean, std, grid
 
     def plot_marginal(self, param, resolution=100, log_scale=None, show=True):
         """
@@ -205,90 +212,57 @@ class Visualizer(object):
         if type(param) == str:
             param = self.cs.get_idx_by_hyperparameter_name(param)
         param_name = self.cs_params[param].name
-
-        if log_scale is None:
-            log_scale = self.cs_params[param].log
-
-        mean, std, grid = self.generate_marginal(param, resolution)
-        mean = np.asarray(mean)
-        std = np.asarray(std)
         
-        lower_curve = mean - std
-        upper_curve = mean + std
-
-        if log_scale or (np.diff(grid).std() > 0.000001):
-            plt.semilogx(grid, mean, 'b')
+        # check if categorical
+        if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
+            labels= self.cs_params[param].choices
+            categorical_size  = self.cs_params[param]._num_choices
+            mean, std = self.generate_marginal(param)
+            indices = np.arange(1,categorical_size+1, 1)
+            b = plt.boxplot([[x] for x in mean])
+            plt.xticks(indices, labels)
+            min_y = mean[0]
+            max_y = mean[0]
+            # blow up boxes 
+            for box, std_ in zip(b["boxes"], std):
+                y = box.get_ydata()
+                y[2:4] = y[2:4] + std_
+                y[0:2] = y[0:2] - std_
+                y[4] = y[4] - std_
+                box.set_ydata(y)
+                min_y = min(min_y, y[0] - std_)
+                max_y = max(max_y, y[2] + std_)
+            
+            plt.ylim([min_y, max_y])
+            
+            plt.ylabel("Performance")
+            plt.xlabel(param_name)
         else:
-            plt.plot(grid, mean, 'b')
-        plt.fill_between(grid, upper_curve, lower_curve, facecolor='red', alpha=0.6)
-        plt.xlabel(param_name)
-        
-        plt.ylabel("Performance")
+
+            if log_scale is None:
+                log_scale = self.cs_params[param].log
+    
+            mean, std, grid = self.generate_marginal(param, resolution)
+            mean = np.asarray(mean)
+            std = np.asarray(std)
+            
+            lower_curve = mean - std
+            upper_curve = mean + std
+    
+            if log_scale or (np.diff(grid).std() > 0.000001):
+                plt.semilogx(grid, mean, 'b')
+            else:
+                plt.plot(grid, mean, 'b')
+            plt.fill_between(grid, upper_curve, lower_curve, facecolor='red', alpha=0.6)
+            plt.xlabel(param_name)
+            
+            plt.ylabel("Performance")
+            
         if show:
             plt.show()
         else:
             return plt
-
-    def get_categorical_marginal(self, param):
-        """
-        Creates marginals of a selected categorical parameter
         
-        Parameters
-        ------------
-        param: int or str
-            Index of chosen categorical parameter in the ConfigSpace (starts with 0)
-        
-        """
-        if type(param) == str:
-            param = self.cs.get_idx_by_hyperparameter_name(param)
-        param_name = self.cs_params[param].name
-        labels= self.cs_params[param].choices
-        categorical_size  = self.cs_params[param]._num_choices
-        marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
-        mean, std = list(zip(*marginals))
-
-        return mean, std
-        
-    def plot_categorical_marginal(self, param, show=True):
-        """
-        Creates a plot of marginal of a selected categorical parameter
-        
-        Parameters
-        ------------
-        param: int or str
-            Index of chosen categorical parameter in the ConfigSpace (starts with 0)
-        
-        """
-        if type(param) == str:
-            param = self.cs.get_idx_by_hyperparameter_name(param)
-        param_name = self.cs_params[param].name
-        labels= self.cs_params[param].choices
-        categorical_size  = self.cs_params[param]._num_choices
-
-        mean, std = self.get_categorical_marginal(param)
-        indices = np.arange(1,categorical_size+1, 1)
-        b = plt.boxplot([[x] for x in mean])
-        plt.xticks(indices, labels)
-        min_y = mean[0]
-        max_y = mean[0]
-        # blow up boxes 
-        for box, std_ in zip(b["boxes"], std):
-            y = box.get_ydata()
-            y[2:4] = y[2:4] + std_
-            y[0:2] = y[0:2] - std_
-            y[4] = y[4] - std_
-            box.set_ydata(y)
-            min_y = min(min_y, y[0] - std_)
-            max_y = max(max_y, y[2] + std_)
-        
-        plt.ylim([min_y, max_y])
-        
-        plt.ylabel("Performance")
-        plt.xlabel(param_name)
-        if show:
-            plt.show()
-        else:
-            return plt
             
         
     def create_most_important_pairwise_marginal_plots(self, directory, n=20):
