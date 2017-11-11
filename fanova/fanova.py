@@ -372,7 +372,8 @@ class fANOVA(object):
         for combi in pairs:
             pairwise_marginal_performance = self.quantify_importance(combi)
             tot_imp = pairwise_marginal_performance[combi]['total importance']
-            pairwise_marginals.append((tot_imp, combi[0], combi[1]))
+            combi_names = [self.cs_params[combi[0]].name, self.cs_params[combi[1]].name]
+            pairwise_marginals.append((tot_imp, combi_names[0], combi_names[1]))
         
         pairwise_marginal_performance = sorted(pairwise_marginals, reverse=True)
 
