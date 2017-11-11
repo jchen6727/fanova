@@ -21,12 +21,12 @@ This creates a new Fanova object and fits the Random Forest on the specified dat
 To compute now the marginal of the first parameter type:
 
     >>> f.quantify_importance((0, ))
-        5.44551614362
+        0.075414122571199116
 
 Fanova also allows to specify parameters by their names.
 
     >>> f.quantify_importance(("Col0", ))
-    5.44551614362
+    	0.075414122571199116
 
 
 Advanced
