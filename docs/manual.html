@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Manual &#8212; fanova 1.0 documentation</title>
+    <title>Manual &mdash; fanova 1.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -17,31 +17,37 @@
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="fanova 1.0 documentation" href="index.html" />
     <link rel="next" title="Citing Fanova" href="cite.html" />
-    <link rel="prev" title="Installation" href="install.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Installation" href="install.html" /> 
   </head>
-  <body role="document">
-  
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cite.html" title="Citing Fanova"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">fanova 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="manual">
 <h1>Manual<a class="headerlink" href="#manual" title="Permalink to this headline">¶</a></h1>
@@ -49,39 +55,39 @@
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
 <p>To run the examples, just download the <a class="reference external" href="https://github.com/automl/fanova/blob/master/fanova/example/online_lda.tar.gz">data</a> and start the python console.
 We can then import Fanova and start it by typing</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fanova</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fanova</span> <span class="kn">import</span> <span class="n">fANOVA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">csv</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/example_data/online_lda/online_lda_features.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/example_data/online_lda/online_lda_responses.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Fanova</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;/example_data/online_lda/online_lda_features.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&quot;,&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;/example_data/online_lda/online_lda_responses.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&quot;,&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fANOVA</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This creates a new Fanova object and fits the Random Forest on the specified data set.</p>
 <p>To compute now the marginal of the first parameter type:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">))</span>
-<span class="go">    0.056762881343945304</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">))</span>
+<span class="go">    5.44551614362</span>
 </pre></div>
 </div>
 <p>Fanova also allows to specify parameters by their names.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">((</span><span class="s2">&quot;Col0&quot;</span><span class="p">,</span> <span class="p">))</span>
-<span class="go">    0.056762881343945304</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">((</span><span class="s">&quot;Col0&quot;</span><span class="p">,</span> <span class="p">))</span>
+<span class="go">5.44551614362</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="advanced">
 <h2>Advanced<a class="headerlink" href="#advanced" title="Permalink to this headline">¶</a></h2>
 <p>If you want the Fanova only a certain quantiles (let&#8217;s say between 10% and 25%) of the data you can call it by:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Fanova</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fANOVA</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">set_cutoffs</span><span class="p">(</span><span class="n">quantile</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Furthermore fANOVA now supports cutoffs on the y values. These will exclude parts of the parameters space where the prediction is not within the provided cutoffs.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">set_cutoffs</span><span class="p">(</span><span class="n">cutoffs</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">set_cutoffs</span><span class="p">(</span><span class="n">cutoffs</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>You can also specify the number of trees in the random forest as well as the minimum number of points to make a new split in a tree or your already specified configuration space by:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Fanova</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">config_space</span><span class="o">=</span><span class="n">config_space</span><span class="p">,</span> <span class="n">num_trees</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fANOVA</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">config_space</span><span class="o">=</span><span class="n">config_space</span><span class="p">,</span> <span class="n">num_trees</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -93,42 +99,52 @@ We can then import Fanova and start it by typing</p>
 </ul>
 <p>Returns the <strong>n</strong> most important pairwise marginals</p>
 <ul class="simple">
-<li><strong>Fanova.marginal_mean_variance_for_values(p, v)</strong></li>
+<li><strong>f.get_most_important_pairwise_marginals(params)</strong></li>
+</ul>
+<p>Returns the pairwise marginals of all elements in the list.</p>
+<ul class="simple">
+<li><strong>fANOVA.marginal_mean_variance_for_values(p, v)</strong></li>
 </ul>
 <p>Computes the mean and standard deviation of the parameter (or parameterlist) <strong>p</strong> for a certain value <strong>v</strong></p>
 </div></blockquote>
 </div>
+<div class="section" id="pysmac">
+<h2>pysmac<a class="headerlink" href="#pysmac" title="Permalink to this headline">¶</a></h2>
+<p>In order to run fANOVA on pysmac output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pysmac.utils.pysmac_fanova</span> <span class="kn">as</span> <span class="nn">pysmac_fanova</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fanova</span> <span class="o">=</span> <span class="n">pysmac_fanova</span><span class="o">.</span><span class="n">smac_to_fanova</span><span class="p">(</span><span class="s">&#39;path_to/pysmac_output_dir/out/scenario&#39;</span><span class="p">,</span> <span class="s">&#39;path_to/merged_states&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="visualization">
 <h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h2>
 <p>To visualize the single and pairwise marginals, we have to create a visualizer object first containing the fanova object and configspace</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">visualizer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span> <span class="o">=</span> <span class="n">visualizer</span><span class="o">.</span><span class="n">Visualizer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">config_space</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fanova.visualizer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span> <span class="o">=</span> <span class="n">fanova</span><span class="o">.</span><span class="n">visualizer</span><span class="o">.</span><span class="n">Visualizer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">config_space</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We can then plot single marginals by</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">plot_marginal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">plot_marginal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>what should look like this</p>
 <img alt="_images/Col1.png" src="_images/Col1.png" />
-<p>NOTE: For categorical values use the function plot_categorical_marginal(parameter) instead.</p>
 <p>The same can been done for pairwise marginals</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">plot_pairwise_marginal</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">plot_pairwise_marginal</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
 <img alt="_images/pairwise.png" src="_images/pairwise.png" />
 <p>If you are just interested in the N most important pairwise marginals you can plot them through:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">create_most_important_pairwise_marginal_plots</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">create_most_important_pairwise_marginal_plots</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>and Fanova will save those plot in dir. However, be aware that to create the plots Fanova needs to compute all pairwise marginal, which can take awhile!</p>
 <p>If you&#8217;re not interested in the plot itself, but want to extract the values for your own plots, simply call</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">generate_marginal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">generate_marginal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The same for generate_pairwise_marginal([0,2]) and get_categorical_marginal().</p>
 <p>At last, all plots can be created together and stored in a directory with</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">create_all_plots</span><span class="p">(</span><span class="s2">&quot;./plots/&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">create_all_plots</span><span class="p">(</span><span class="s">&quot;./plots/&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -143,7 +159,7 @@ We can then import Fanova and start it by typing</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -151,55 +167,59 @@ We can then import Fanova and start it by typing</p>
 <li><a class="reference internal" href="#quick-start">Quick Start</a></li>
 <li><a class="reference internal" href="#advanced">Advanced</a></li>
 <li><a class="reference internal" href="#more-functions">More functions</a></li>
+<li><a class="reference internal" href="#pysmac">pysmac</a></li>
 <li><a class="reference internal" href="#visualization">Visualization</a></li>
 <li><a class="reference internal" href="#how-to-load-a-csv-file">How to load a CSV-file</a></li>
 </ul>
 </li>
 </ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="install.html" title="previous chapter">Installation</a></li>
-      <li>Next: <a href="cite.html" title="next chapter">Citing Fanova</a></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/manual.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cite.html"
+                        title="next chapter">Citing Fanova</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/manual.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2015, Frank Hutter, Aaron Klein.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/manual.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cite.html" title="Citing Fanova"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="index.html">fanova 1.0 documentation</a> &raquo;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer">
+        &copy; Copyright 2015, Frank Hutter, Aaron Klein.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
   </body>
 </html>
