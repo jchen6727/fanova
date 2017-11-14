@@ -364,9 +364,11 @@ class fANOVA(object):
                 for i, param in enumerate(params):
                     idx.append(self.cs.get_idx_by_hyperparameter_name(param))
                 dimensions = idx
+
             else:
                 dimensions = params
-        pairs = it.combinations(dimensions,2)
+        #pairs = it.combinations(dimensions,2)
+        pairs = [x for x in it.combinations(dimensions,2)]
         if params:
             n = len(list(pairs))
         for combi in pairs:

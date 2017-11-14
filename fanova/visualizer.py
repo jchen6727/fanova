@@ -266,7 +266,7 @@ class Visualizer(object):
         
             
         
-    def create_most_important_pairwise_marginal_plots(self, directory, n=20):
+    def create_most_important_pairwise_marginal_plots(self, directory, params=None, n=20):
         """
         Creates plots of the n most important pairwise marginals of the whole ConfigSpace
         
@@ -279,8 +279,13 @@ class Visualizer(object):
              The number of most relevant pairwise marginals that will be returned
             
         """
-        most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(n)
+        if params:
+            most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(params=params)
+        else:    
+            most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(n=n)
+
         for param1, param2 in most_important_pairwise_marginals:
+            param1, param2 = self.cs.get_idx_by_hyperparameter_name(param1), self.cs.get_idx_by_hyperparameter_name(param2)
             if isinstance(self.cs_params[param1], CategoricalHyperparameter) or isinstance(self.cs_params[param2], CategoricalHyperparameter):
                 warnings.warn("The pair (%s,%s) consists of at least one categorical hyperparameter."
                               "Therefore no pairwise plot available for this case." 
@@ -288,7 +293,6 @@ class Visualizer(object):
             else:
                 param_names = [self.cs_params[param1].name, self.cs_params[param2].name]
                 outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
-                plt.clf()
                 print("creating %s" % outfile_name)
-                self.plot_pairwise_marginal([param1, param2], show=False)
+                self.plot_pairwise_marginal((param1, param2), show=False)
                 plt.savefig(outfile_name)
