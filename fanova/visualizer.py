@@ -2,6 +2,7 @@ from ConfigSpace.hyperparameters import CategoricalHyperparameter
 import os
 import numpy as np
 import warnings
+import pickle
 
 import matplotlib.pyplot as plt
 import itertools as it
@@ -10,34 +11,34 @@ from mpl_toolkits.mplot3d import Axes3D
 
 class Visualizer(object):
 
-    def __init__(self, fanova, cs):
+    def __init__(self, fanova, cs, directory):
         """        
         Parameters
         ------------
+        fanova: fANOVA object
+        
         cs : ConfigSpace instantiation
         
-        forest: trained random forest        
+        directory: str
+            Path to the directory in which all plots will be stored
         """
         self.fanova = fanova
         self.cs = cs
         self.cs_params = cs.get_hyperparameters()
+        assert os.path.exists(directory), "directory %s doesn't exist" % directory
+        self.directory = directory
 
-    def create_all_plots(self, directory, **kwargs):
+    def create_all_plots(self, **kwargs):
         """
         Creates plots for all main effects and stores them into a directory
         
-        Parameters
-        ------------
-        directory: str
-                Path to the directory in which all plots will be stored
         """
-        assert os.path.exists(directory), "directory %s doesn't exist" % directory
 
         for i in range(len(self.cs_params)):
             param = i
             param_name = self.cs_params[param].name
             plt.close()
-            outfile_name = os.path.join(directory, param_name.replace(os.sep, "_") + ".png")
+            outfile_name = os.path.join(self.directory, param_name.replace(os.sep, "_") + ".png")
             print("creating %s" % outfile_name)
             
             self.plot_marginal(param, show=False, **kwargs)
@@ -53,7 +54,7 @@ class Visualizer(object):
             for p in combi:
                 param_names.append(self.cs_params[p].name)
             plt.close()
-            outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
+            outfile_name = os.path.join(self.directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
             print("creating %s" % outfile_name)
             self.plot_pairwise_marginal(combi, **kwargs)
             plt.savefig(outfile_name)
@@ -136,6 +137,10 @@ class Visualizer(object):
         if show:
             plt.show()
         else:
+            interact_dir = self.directory + '/interactive_plots'
+            if not os.path.exists(interact_dir):
+                os.makedirs(interact_dir)
+            pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pickle' %(param_names[0],param_names[1]), 'wb'))
             return plt
 
     def generate_marginal(self, param, resolution=100):
@@ -238,6 +243,8 @@ class Visualizer(object):
             
             plt.ylabel("Performance")
             plt.xlabel(param_name)
+            plt.tight_layout()
+            
         else:
 
             if log_scale is None:
@@ -258,6 +265,7 @@ class Visualizer(object):
             plt.xlabel(param_name)
             
             plt.ylabel("Performance")
+            plt.tight_layout()
             
         if show:
             plt.show()
@@ -266,15 +274,14 @@ class Visualizer(object):
         
             
         
-    def create_most_important_pairwise_marginal_plots(self, directory, params=None, n=20):
+    def create_most_important_pairwise_marginal_plots(self, params=None, n=20):
         """
         Creates plots of the n most important pairwise marginals of the whole ConfigSpace
         
         Parameters
         ------------
-        directory: str
-            Path to the directory in which all plots will be stored
-        
+        params = list
+             Contains the selected parameters for pairwise evaluation
         n: int
              The number of most relevant pairwise marginals that will be returned
             
@@ -292,7 +299,7 @@ class Visualizer(object):
                               %(self.cs_params[param1].name, self.cs_params[param2].name))
             else:
                 param_names = [self.cs_params[param1].name, self.cs_params[param2].name]
-                outfile_name = os.path.join(directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
+                outfile_name = os.path.join(self.directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
                 print("creating %s" % outfile_name)
                 self.plot_pairwise_marginal((param1, param2), show=False)
                 plt.savefig(outfile_name)
