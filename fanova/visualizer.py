@@ -185,8 +185,6 @@ class Visualizer(object):
                     raise ValueError()
             else:
                 grid = np.linspace(lower_bound, upper_bound, resolution)
-            if self.fanova.config_on_hypercube:
-                grid = self.cs_params[param]._transform(grid)
             mean = np.zeros(resolution)
             std = np.zeros(resolution)
     
@@ -195,7 +193,8 @@ class Visualizer(object):
                 (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
                 mean[i] = m
                 std[i] = np.sqrt(v)
-
+            if self.fanova.config_on_hypercube:
+                grid = self.cs_params[param]._transform(grid)
             return mean, std, grid
 
     def plot_marginal(self, param, resolution=100, log_scale=None, show=True):
