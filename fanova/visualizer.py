@@ -285,10 +285,13 @@ class Visualizer(object):
              The number of most relevant pairwise marginals that will be returned
             
         """
-        if params:
-            most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(params=params)
-        else:    
-            most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(n=n)
+        if self.fanova._dict:
+            most_important_pairwise_marginals = self.fanova.tot_imp_dict
+        else:
+            if params:
+                most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(params=params)
+            else:    
+                most_important_pairwise_marginals = self.fanova.get_most_important_pairwise_marginals(n=n)
 
         for param1, param2 in most_important_pairwise_marginals:
             param1, param2 = self.cs.get_idx_by_hyperparameter_name(param1), self.cs.get_idx_by_hyperparameter_name(param2)

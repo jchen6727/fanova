@@ -354,7 +354,7 @@ class fANOVA(object):
         list: 
              Contains the n most important pairwise marginals
         """
-        tot_imp_dict = OrderedDict()
+        self.tot_imp_dict = OrderedDict()
         pairwise_marginals = []
         if params is None:
             dimensions = range(self.n_dims)
@@ -382,6 +382,7 @@ class fANOVA(object):
         #important_pairwise_marginals = [((p1, p2), marginal) for marginal, p1, p2  in pairwise_marginal_performance[:n]]
 
         for marginal, p1, p2  in pairwise_marginal_performance[:n]:
-            tot_imp_dict[(p1,p2)] = marginal
-
-        return tot_imp_dict
+            self.tot_imp_dict[(p1,p2)] = marginal
+        self._dict=  True
+        
+        return self.tot_imp_dict
