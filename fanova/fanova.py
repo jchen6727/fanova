@@ -344,7 +344,7 @@ class fANOVA(object):
 
         return self.the_forest.marginal_mean_variance_prediction(sample)
 
-    def get_most_important_pairwise_marginals(self, n=10):
+    def get_most_important_pairwise_marginals(self, params=None, n=10):
         """
         Returns the n most important pairwise marginals from the whole ConfigSpace
             
@@ -358,20 +358,35 @@ class fANOVA(object):
         list: 
              Contains the n most important pairwise marginals
         """
-        tot_imp_dict = OrderedDict()
+        self.tot_imp_dict = OrderedDict()
         pairwise_marginals = []
-        dimensions = range(self.n_dims)
-        for combi in it.combinations(dimensions,2):
+        if params is None:
+            dimensions = range(self.n_dims)
+        else:
+            if type(params[0]) == str:
+                idx = []
+                for i, param in enumerate(params):
+                    idx.append(self.cs.get_idx_by_hyperparameter_name(param))
+                dimensions = idx
 
+            else:
+                dimensions = params
+        #pairs = it.combinations(dimensions,2)
+        pairs = [x for x in it.combinations(dimensions,2)]
+        if params:
+            n = len(list(pairs))
+        for combi in pairs:
             pairwise_marginal_performance = self.quantify_importance(combi)
             tot_imp = pairwise_marginal_performance[combi]['total importance']
-            pairwise_marginals.append((tot_imp, combi[0], combi[1]))
+            combi_names = [self.cs_params[combi[0]].name, self.cs_params[combi[1]].name]
+            pairwise_marginals.append((tot_imp, combi_names[0], combi_names[1]))
         
         pairwise_marginal_performance = sorted(pairwise_marginals, reverse=True)
 
         #important_pairwise_marginals = [((p1, p2), marginal) for marginal, p1, p2  in pairwise_marginal_performance[:n]]
 
         for marginal, p1, p2  in pairwise_marginal_performance[:n]:
-            tot_imp_dict[(p1,p2)] = marginal
-
-        return tot_imp_dict
+            self.tot_imp_dict[(p1,p2)] = marginal
+        self._dict=  True
+        
+        return self.tot_imp_dict
