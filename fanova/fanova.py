@@ -121,7 +121,11 @@ class fANOVA(object):
                 data.set_bounds_of_feature(i, mn, mx)
 
         for i in range(len(Y)):
-            data.add_data_point(X[i].tolist(),Y[i])
+            try:
+                data.add_data_point(X[i].tolist(),Y[i])
+            except:
+                print("failed to process datapoint:", X[i].tolist())
+                raise
         
         forest.fit(data, rng)
 
