@@ -46,18 +46,21 @@ class Visualizer(object):
         # additional pairwise plots:
         dimensions = []
         for i in range(len(self.cs_params)):
-            if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
                 dimensions.append(i)
         combis = list(it.combinations(dimensions,2))
         for combi in combis:
             param_names = []
-            for p in combi:
-                param_names.append(self.cs_params[p].name)
-            plt.close()
-            outfile_name = os.path.join(self.directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
-            print("creating %s" % outfile_name)
-            self.plot_pairwise_marginal(combi, **kwargs)
-            plt.savefig(outfile_name)
+            # ToDo:
+            if ((isinstance(self.cs_params[combi[0]], (CategoricalHyperparameter))) and not (isinstance(self.cs_params[combi[1]], (CategoricalHyperparameter)))) or ((isinstance(self.cs_params[combi[1]], (CategoricalHyperparameter))) and not (isinstance(self.cs_params[combi[0]], (CategoricalHyperparameter)))):
+                pass
+            else:
+                for p in combi:
+                    param_names.append(self.cs_params[p].name)
+                plt.close()
+                outfile_name = os.path.join(self.directory, str(param_names).replace(os.sep, "_").replace("'","") + ".png")
+                print("creating %s" % outfile_name)
+                self.plot_pairwise_marginal(combi, **kwargs)
+                plt.savefig(outfile_name)
 
     def generate_pairwise_marginal(self, param_indices, resolution=20):
         """
@@ -74,28 +77,50 @@ class Visualizer(object):
 
         """
         assert len(param_indices) == 2, "You have to specify 2 (different) parameters"
-        
         grid_list = []
         param_names = []
-
+        if isinstance(self.cs_params[param_indices[0]], (CategoricalHyperparameter)) and isinstance(self.cs_params[param_indices[1]], (CategoricalHyperparameter)):
+            choice_arr = []
+            param_names = []
+            choice_vals = []
+            for p in param_indices:
+                choice_arr.append(self.cs_params[p].choices)
+                choice_vals.append(np.arange(len(self.cs_params[p].choices)))
+                param_names.append(self.cs_params[p].name)
+            choice_arr = [[choice_arr[1], choice_arr[0]] if len(choice_arr[1]) > len(choice_arr[0]) else [choice_arr[0],choice_arr[1]]]
+            choice_vals = [[choice_vals[1], choice_vals[0]] if len(choice_vals[1]) > len(choice_vals[0]) else [choice_vals[0],choice_vals[1]]]
+            choice_arr = np.asarray(choice_arr).squeeze()
+            choice_vals = np.asarray(choice_vals).squeeze()
+            param_indices = [[param_indices[1], param_indices[0]] if len(choice_vals[1]) > len(choice_vals[0]) else [param_indices[0], param_indices[1]]]
+            choice_arr = np.asarray(choice_arr).squeeze()
+            choice_vals = np.asarray(choice_vals).squeeze()
+            param_indices = np.asarray(param_indices).squeeze()
+            zz = np.zeros((len(choice_vals[0]), len(choice_vals[1])))
+            for i, y_value in enumerate(choice_vals[1]):
+                for j, x_value in enumerate(choice_vals[0]):
+                    zz[i][j] = self.fanova.marginal_mean_variance_for_values(param_indices, [x_value, y_value])[0]
+            
+            return choice_arr, zz
+            
+        else:
                 
-        for p in param_indices:
-            lower_bound = self.cs_params[p].lower
-            upper_bound = self.cs_params[p].upper
-            param_names.append(self.cs_params[p].name)
-            grid = np.linspace(lower_bound, upper_bound, resolution)
-            if self.fanova.config_on_hypercube:
-                grid = self.cs_params[p]._transform(grid)
-            grid_list.append(grid)
-
-        zz = np.zeros([resolution * resolution])
-        for i, y_value in enumerate(grid_list[1]):
-            for j, x_value in enumerate(grid_list[0]):
-                zz[i * resolution + j] = self.fanova.marginal_mean_variance_for_values(param_indices, [x_value, y_value])[0]
-
-        zz = np.reshape(zz, [resolution, resolution])
-
-        return grid_list, zz
+            for p in param_indices:
+                lower_bound = self.cs_params[p].lower
+                upper_bound = self.cs_params[p].upper
+                param_names.append(self.cs_params[p].name)
+                grid = np.linspace(lower_bound, upper_bound, resolution)
+                if self.fanova.config_on_hypercube:
+                    grid = self.cs_params[p]._transform(grid)
+                grid_list.append(grid)
+    
+            zz = np.zeros([resolution * resolution])
+            for i, y_value in enumerate(grid_list[1]):
+                for j, x_value in enumerate(grid_list[0]):
+                    zz[i * resolution + j] = self.fanova.marginal_mean_variance_for_values(param_indices, [x_value, y_value])[0]
+    
+            zz = np.reshape(zz, [resolution, resolution])
+    
+            return grid_list, zz
 
     def plot_pairwise_marginal(self, param_list, resolution=20, show=False):
         """
@@ -121,26 +146,43 @@ class Visualizer(object):
             param_names.append(self.cs_params[p].name)
             param_indices.append(p)
 
-
-        grid_list, zz = self.generate_pairwise_marginal(param_indices, resolution)
-
-        display_xx, display_yy = np.meshgrid(grid_list[0], grid_list[1])
-
-        fig = plt.figure()
-        ax = Axes3D(fig)
-
-        surface = ax.plot_surface(display_xx, display_yy, zz, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
-        ax.set_xlabel(param_names[0])
-        ax.set_ylabel(param_names[1])
-        ax.set_zlabel("Performance")
-        fig.colorbar(surface, shrink=0.5, aspect=5)
-        if show:
-            plt.show()
+        if isinstance(self.cs_params[param_indices[0]], (CategoricalHyperparameter)) and isinstance(self.cs_params[param_indices[1]], (CategoricalHyperparameter)):
+            choices, zz = self.generate_pairwise_marginal(param_indices, resolution)
+            
+            fig = plt.figure()
+            plt.imshow(zz, cmap='hot', interpolation='nearest')
+            plt.xticks(np.arange(0,len(choices[0])), choices[0], fontsize=8)
+            plt.yticks(np.arange(0,len(choices[1])), choices[1], fontsize=8)
+            plt.xlabel(param_names[0])
+            plt.ylabel(param_names[1])
+            plt.colorbar().set_label("Performance")
+            if show:
+                plt.show()
+        
+        # ToDo:
+        elif isinstance(self.cs_params[param_indices[0]], (CategoricalHyperparameter)) or isinstance(self.cs_params[param_indices[1]], (CategoricalHyperparameter)):
+            pass
+        
         else:
-            interact_dir = self.directory + '/interactive_plots'
-            if not os.path.exists(interact_dir):
-                os.makedirs(interact_dir)
-            pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pickle' %(param_names[0],param_names[1]), 'wb'))
+            grid_list, zz = self.generate_pairwise_marginal(param_indices, resolution)
+    
+            display_xx, display_yy = np.meshgrid(grid_list[0], grid_list[1])
+    
+            fig = plt.figure()
+            ax = Axes3D(fig)
+    
+            surface = ax.plot_surface(display_xx, display_yy, zz, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
+            ax.set_xlabel(param_names[0])
+            ax.set_ylabel(param_names[1])
+            ax.set_zlabel("Performance")
+            fig.colorbar(surface, shrink=0.5, aspect=5)
+            if show:
+                plt.show()
+            else:
+                interact_dir = self.directory + '/interactive_plots'
+                if not os.path.exists(interact_dir):
+                    os.makedirs(interact_dir)
+                pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pickle' %(param_names[0],param_names[1]), 'wb'))
             return plt
 
     def generate_marginal(self, param, resolution=100):
@@ -179,10 +221,12 @@ class Visualizer(object):
                 log_lower = np.log(lower_bound) / np.log(base)
                 log_upper = np.log(upper_bound) / np.log(base)
                 grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
+                '''
                 if abs(grid[0] - lower_bound) > 0.00001:
                     raise ValueError()
                 if abs(grid[-1] - upper_bound) > 0.00001:
                     raise ValueError()
+                '''
             else:
                 grid = np.linspace(lower_bound, upper_bound, resolution)
             mean = np.zeros(resolution)

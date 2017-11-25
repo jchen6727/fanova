@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "fanova",
-    version = "2.0.0",
+    version = "2.0.1",
     packages = find_packages(),
     install_requires = [
                         'numpy',
@@ -11,7 +11,7 @@ setup(
                         'matplotlib>=1.4.2',
                         'ConfigSpace'],
 
-    author = "Stefan Falkner and Christina Hernandez-Wunsch. Legacy branch: Tobias Domhan, Aaron Klein and Frank Hutter (FANOVA)",
+    author = "Stefan Falkner and Christina Hernandez Wunsch. Legacy branch: Tobias Domhan, Aaron Klein and Frank Hutter (FANOVA)",
     author_email = "sfalkner@cs.uni-freiburg.de",
     description = "Functional ANOVA: an implementation of the ICML 2014 paper 'An Efficient Approach for Assessing Hyperparameter Importance' by Frank Hutter, Holger Hoos and Kevin Leyton-Brown.",
     include_package_data = True,
