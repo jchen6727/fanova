@@ -78,7 +78,7 @@ class fANOVA(object):
                         raise RuntimeError('Some sample values from X are not sampled on the hypercube')
             else:
                 unique_vals = set(X[:, i])
-                if len(unique_vals) > self.cs_params[i]._num_choices:
+                if len(unique_vals) > len(self.cs_params[i].choices):
                     raise RuntimeError('There are some categoricals missing in the ConfigSpace specification')
 
         # initialize all types as 0
