@@ -205,7 +205,7 @@ class Visualizer(object):
         if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
             param_name = self.cs_params[param].name
             labels= self.cs_params[param].choices
-            categorical_size  = self.cs_params[param]._num_choices
+            categorical_size  = len(self.cs_params[param].choices)
             marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
             mean, v = list(zip(*marginals))
             std = np.sqrt(v)
@@ -265,7 +265,7 @@ class Visualizer(object):
         # check if categorical
         if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
             labels= self.cs_params[param].choices
-            categorical_size  = self.cs_params[param]._num_choices
+            categorical_size  = len(self.cs_params[param].choices)
             mean, std = self.generate_marginal(param)
             indices = np.arange(1,categorical_size+1, 1)
             b = plt.boxplot([[x] for x in mean])
@@ -349,3 +349,4 @@ class Visualizer(object):
                 print("creating %s" % outfile_name)
                 self.plot_pairwise_marginal((param1, param2), show=False)
                 plt.savefig(outfile_name)
+
