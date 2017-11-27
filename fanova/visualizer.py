@@ -87,17 +87,18 @@ class Visualizer(object):
                 choice_arr.append(self.cs_params[p].choices)
                 choice_vals.append(np.arange(len(self.cs_params[p].choices)))
                 param_names.append(self.cs_params[p].name)
-            choice_arr = [[choice_arr[1], choice_arr[0]] if len(choice_arr[1]) > len(choice_arr[0]) else [choice_arr[0],choice_arr[1]]]
-            choice_vals = [[choice_vals[1], choice_vals[0]] if len(choice_vals[1]) > len(choice_vals[0]) else [choice_vals[0],choice_vals[1]]]
+            choice_arr = [[choice_arr[1], choice_arr[0]] if len(choice_arr[1]) > len(choice_arr[0]) else [choice_arr[0], choice_arr[1]]]
+            choice_vals = [[choice_vals[1], choice_vals[0]] if len(choice_vals[1]) < len(choice_vals[0]) else [choice_vals[0],choice_vals[1]]]
             choice_arr = np.asarray(choice_arr).squeeze()
             choice_vals = np.asarray(choice_vals).squeeze()
-            param_indices = [[param_indices[1], param_indices[0]] if len(choice_vals[1]) > len(choice_vals[0]) else [param_indices[0], param_indices[1]]]
+            param_indices = [[param_indices[1], param_indices[0]] if len(choice_vals[1]) < len(choice_vals[0]) else [param_indices[0], param_indices[1]]]
             choice_arr = np.asarray(choice_arr).squeeze()
             choice_vals = np.asarray(choice_vals).squeeze()
             param_indices = np.asarray(param_indices).squeeze()
             zz = np.zeros((len(choice_vals[0]), len(choice_vals[1])))
-            for i, y_value in enumerate(choice_vals[1]):
-                for j, x_value in enumerate(choice_vals[0]):
+            
+            for i, x_value in enumerate(choice_vals[0]):
+                for j, y_value in enumerate(choice_vals[1]):
                     zz[i][j] = self.fanova.marginal_mean_variance_for_values(param_indices, [x_value, y_value])[0]
             
             return choice_arr, zz
