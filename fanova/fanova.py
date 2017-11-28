@@ -62,6 +62,7 @@ class fANOVA(object):
         self.n_dims = len(self.cs_params)
         self.n_trees = n_trees
         self.config_on_hypercube = config_on_hypercube
+        self._dict = False
 
         # at this point we have a valid ConfigSpace object
         # check if param number is correct etc:
@@ -387,6 +388,6 @@ class fANOVA(object):
 
         for marginal, p1, p2  in pairwise_marginal_performance[:n]:
             self.tot_imp_dict[(p1,p2)] = marginal
-        self._dict=  True
+        self._dict=True
         
         return self.tot_imp_dict
