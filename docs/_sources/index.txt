@@ -1,6 +1,8 @@
-Welcome to fanova's documentation!
+Welcome to fANOVA's documentation!
 ==================================
+The functional analysis of variance (**fANOVA**) framework is used for quantifying the performance of functions.
 
+It provides insight into te relationships between parameter setting and performance.
 
 Contents:
 
@@ -10,6 +12,7 @@ Contents:
    includeme
    install
    manual
+   fanova_starter
    cite
 
 

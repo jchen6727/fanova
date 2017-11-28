@@ -6,7 +6,7 @@ Installation
 
 Requirements
 ------------
-Fanova requires:
+fANOVA requires:
 
 `Numpy <https://pypi.python.org/pypi/numpy>`_
 
@@ -17,7 +17,7 @@ Fanova requires:
 Manually
 ------------
 
-To install fanova from command line type the following commands in your bash terminal:
+To install fANOVA from command line type the following commands in your bash terminal:
 
 	:bash:`git clone https://github.com/automl/fanova.git`
 

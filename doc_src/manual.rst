@@ -7,7 +7,7 @@ Manual
 Quick Start
 -----------
 To run the examples, just download the `data <https://github.com/automl/fanova/blob/master/fanova/example/online_lda.tar.gz>`_ and start the python console.
-We can then import Fanova and start it by typing
+We can then import fANOVA and start it by typing
 
     >>> from fanova import fANOVA
     >>> import csv
@@ -16,14 +16,14 @@ We can then import Fanova and start it by typing
     >>> Y = np.loadtxt(path + '/example_data/online_lda/online_lda_responses.csv', delimiter=",")
     >>> f = fANOVA(X,Y)
 
-This creates a new Fanova object and fits the Random Forest on the specified data set.
+This creates a new fANOVA object and fits the Random Forest on the specified data set.
 
 To compute now the marginal of the first parameter type:
 
     >>> f.quantify_importance((0, ))
         0.075414122571199116
 
-Fanova also allows to specify parameters by their names.
+fANOVA also allows to specify parameters by their names.
 
     >>> f.quantify_importance(("Col0", ))
     	0.075414122571199116
@@ -32,7 +32,7 @@ Fanova also allows to specify parameters by their names.
 Advanced
 --------
 
-If you want the Fanova only a certain quantiles (let's say between 10% and 25%) of the data you can call it by:
+If you want the fANOVA only a certain quantiles (let's say between 10% and 25%) of the data you can call it by:
 
 	>>> f = fANOVA(X,Y)
 	>>> f.set_cutoffs(quantile=(10, 25))
@@ -86,16 +86,16 @@ what should look like this
 
 The same can been done for pairwise marginals
 
-    >>> vis.plot_pairwise_marginal([0,2])
+    >>> vis.plot_pairwise_marginal([0,1])
 
-.. image:: ../examples/example_data/online_lda/pairwise.png
+.. image:: ../examples/example_data/online_lda/figure2.png
 
 
 If you are just interested in the N most important pairwise marginals you can plot them through:
 
     >>> create_most_important_pairwise_marginal_plots(dir, n)
 
-and Fanova will save those plot in dir. However, be aware that to create the plots Fanova needs to compute all pairwise marginal, which can take awhile!
+and fANOVA will save those plot in dir. However, be aware that to create the plots fANOVA needs to compute all pairwise marginal, which can take awhile!
 
 If you're not interested in the plot itself, but want to extract the values for your own plots, simply call
 

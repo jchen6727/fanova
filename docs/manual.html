@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Manual &mdash; fanova 1.0 documentation</title>
+    <title>Manual &mdash; fanova 2.0.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0',
+        VERSION:     '2.0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="fanova 1.0 documentation" href="index.html" />
-    <link rel="next" title="Citing Fanova" href="cite.html" />
+    <link rel="top" title="fanova 2.0.5 documentation" href="index.html" />
+    <link rel="next" title="fANOVA for Starters" href="fanova_starter.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
   </head>
   <body>
@@ -35,12 +35,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cite.html" title="Citing Fanova"
+          <a href="fanova_starter.html" title="fANOVA for Starters"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">fanova 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">fanova 2.0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,7 +54,7 @@
 <div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
 <p>To run the examples, just download the <a class="reference external" href="https://github.com/automl/fanova/blob/master/fanova/example/online_lda.tar.gz">data</a> and start the python console.
-We can then import Fanova and start it by typing</p>
+We can then import fANOVA and start it by typing</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fanova</span> <span class="kn">import</span> <span class="n">fANOVA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">csv</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
@@ -63,13 +63,13 @@ We can then import Fanova and start it by typing</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fANOVA</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This creates a new Fanova object and fits the Random Forest on the specified data set.</p>
+<p>This creates a new fANOVA object and fits the Random Forest on the specified data set.</p>
 <p>To compute now the marginal of the first parameter type:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">))</span>
 <span class="go">    0.075414122571199116</span>
 </pre></div>
 </div>
-<p>Fanova also allows to specify parameters by their names.</p>
+<p>fANOVA also allows to specify parameters by their names.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">((</span><span class="s">&quot;Col0&quot;</span><span class="p">,</span> <span class="p">))</span>
 <span class="go">    0.075414122571199116</span>
 </pre></div>
@@ -77,7 +77,7 @@ We can then import Fanova and start it by typing</p>
 </div>
 <div class="section" id="advanced">
 <h2>Advanced<a class="headerlink" href="#advanced" title="Permalink to this headline">¶</a></h2>
-<p>If you want the Fanova only a certain quantiles (let&#8217;s say between 10% and 25%) of the data you can call it by:</p>
+<p>If you want the fANOVA only a certain quantiles (let&#8217;s say between 10% and 25%) of the data you can call it by:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">fANOVA</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">set_cutoffs</span><span class="p">(</span><span class="n">quantile</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
 </pre></div>
@@ -130,15 +130,15 @@ We can then import Fanova and start it by typing</p>
 <p>what should look like this</p>
 <img alt="_images/Col1.png" src="_images/Col1.png" />
 <p>The same can been done for pairwise marginals</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">plot_pairwise_marginal</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">plot_pairwise_marginal</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="_images/pairwise.png" src="_images/pairwise.png" />
+<img alt="_images/figure2.png" src="_images/figure2.png" />
 <p>If you are just interested in the N most important pairwise marginals you can plot them through:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">create_most_important_pairwise_marginal_plots</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>and Fanova will save those plot in dir. However, be aware that to create the plots Fanova needs to compute all pairwise marginal, which can take awhile!</p>
+<p>and fANOVA will save those plot in dir. However, be aware that to create the plots fANOVA needs to compute all pairwise marginal, which can take awhile!</p>
 <p>If you&#8217;re not interested in the plot itself, but want to extract the values for your own plots, simply call</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">generate_marginal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -188,8 +188,8 @@ We can then import Fanova and start it by typing</p>
   <p class="topless"><a href="install.html"
                         title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cite.html"
-                        title="next chapter">Citing Fanova</a></p>
+  <p class="topless"><a href="fanova_starter.html"
+                        title="next chapter">fANOVA for Starters</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/manual.txt"
@@ -219,16 +219,16 @@ We can then import Fanova and start it by typing</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cite.html" title="Citing Fanova"
+          <a href="fanova_starter.html" title="fANOVA for Starters"
              >next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">fanova 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">fanova 2.0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2015, Frank Hutter, Aaron Klein.
+        &copy; Copyright 2017, Frank Hutter, Stefan Falkner.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

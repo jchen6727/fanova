@@ -1,7 +1,7 @@
-Citing Fanova
+Citing fANOVA
 =================
 
-If you use the Fanova for your research, please cite the ICML 2014 paper "An Efficient Approach for Assessing Hyperparameter Importance" by Frank Hutter, Holger Hoos and Kevin Leyton-Brown.
+If you use the fANOVA for your research, please cite the ICML 2014 paper "An Efficient Approach for Assessing Hyperparameter Importance" by Frank Hutter, Holger Hoos and Kevin Leyton-Brown.
 
 with the following Bibtex file:
 
