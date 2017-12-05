@@ -378,7 +378,7 @@ class fANOVA(object):
             n = len(list(pairs))
         for combi in pairs:
             pairwise_marginal_performance = self.quantify_importance(combi)
-            tot_imp = pairwise_marginal_performance[combi]['total importance']
+            tot_imp = pairwise_marginal_performance[combi]['individual importance']
             combi_names = [self.cs_params[combi[0]].name, self.cs_params[combi[1]].name]
             pairwise_marginals.append((tot_imp, combi_names[0], combi_names[1]))
         
