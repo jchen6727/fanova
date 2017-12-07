@@ -161,12 +161,14 @@ class Visualizer(object):
             choices, zz = self.generate_pairwise_marginal(param_indices, resolution)
             if isinstance(self.cs_params[param_indices[0]], (CategoricalHyperparameter)) and isinstance(self.cs_params[param_indices[1]], (CategoricalHyperparameter)):
                 fig = plt.figure()
+                plt.title('%s and %s' %(param_names[0], param_names[1]))
                 plt.imshow(zz, cmap='hot', interpolation='nearest')
                 plt.xticks(np.arange(0,len(choices[0])), choices[0], fontsize=8)
                 plt.yticks(np.arange(0,len(choices[1])), choices[1], fontsize=8)
                 plt.xlabel(param_names[0])
                 plt.ylabel(param_names[1])
                 plt.colorbar().set_label("Performance")
+                
                 if show:
                     plt.show()
             else:
@@ -177,6 +179,7 @@ class Visualizer(object):
                 fig = plt.figure()
                 for i, cat in enumerate(cats):
                     plt.plot(zz[i], label='%s' %cat)
+                plt.title('%s and %s' %(param_names[0], param_names[1]))
                 plt.ylabel('Performance')
                 plt.xlabel(x_label)
                 plt.legend()
@@ -194,6 +197,7 @@ class Visualizer(object):
             ax.set_xlabel(param_names[0])
             ax.set_ylabel(param_names[1])
             ax.set_zlabel("Performance")
+            plt.title('%s and %s' %(param_names[0], param_names[1]))
             fig.colorbar(surface, shrink=0.5, aspect=5)
             if show:
                 plt.show()
