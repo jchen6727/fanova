@@ -170,9 +170,10 @@ class Visualizer(object):
                 if show:
                     plt.show()
             else:
-                cats =  choices[0] if isinstance(choices[0], str) else choices[1]
+                cat_choices = self.cs_params[param_indices[0]].choices if isinstance(self.cs_params[param_indices[0]], (CategoricalHyperparameter)) else self.cs_params[param_indices[1]].choices
+                cats = choices[0] if (choices[0][0] in cat_choices and choices[0][-1] in cat_choices) else choices[1]
                 x_label = param_names[0] if isinstance(self.cs_params[param_list[1]],(CategoricalHyperparameter)) else param_names[1]
-
+                
                 fig = plt.figure()
                 for i, cat in enumerate(cats):
                     plt.plot(zz[i], label='%s' %cat)
