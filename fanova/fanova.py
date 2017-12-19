@@ -391,3 +391,48 @@ class fANOVA(object):
         self._dict=True
         
         return self.tot_imp_dict
+        
+    def get_triple_marginals(self, params=None):
+        """
+        Returns the n most important pairwise marginals from the whole ConfigSpace
+            
+        Parameters
+        ----------
+        params: list
+             The parameters
+          
+        Returns
+        -------
+        list: 
+             Contains most important triple marginals
+        """
+        self.tot_imp_dict = OrderedDict()
+        triple_marginals = []
+        if len(params) < 3:
+            raise RuntimeError('Number of parameters have to be greater than %i. At least 3 parameters needed' %len(params))
+        if type(params[0]) == str:
+            idx = []
+            for i, param in enumerate(params):
+                idx.append(self.cs.get_idx_by_hyperparameter_name(param))
+            dimensions = idx
+
+        else:
+            dimensions = params
+
+        triplets = [x for x in it.combinations(dimensions,3)]
+        if params:
+            n = len(list(triplets))
+        for combi in triplets:
+            triple_marginal_performance = self.quantify_importance(combi)
+            tot_imp = triple_marginal_performance[combi]['individual importance']
+            combi_names = [self.cs_params[combi[0]].name, self.cs_params[combi[1]].name, self.cs_params[combi[2]].name]
+            triple_marginals.append((tot_imp, combi_names[0], combi_names[1], combi_names[2]))
+        
+        triple_marginal_performance = sorted(triple_marginals, reverse=True)
+
+        #important_pairwise_marginals = [((p1, p2), marginal) for marginal, p1, p2  in pairwise_marginal_performance[:n]]
+
+        for marginal, p1, p2, p3  in triple_marginal_performance[:n]:
+            self.tot_imp_dict[(p1,p2,p3)] = marginal
+        
+        return self.tot_imp_dict

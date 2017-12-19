@@ -206,7 +206,7 @@ class Visualizer(object):
                 print('creating %s/interactive_plots' %self.directory)
                 if not os.path.exists(interact_dir):
                     os.makedirs(interact_dir)
-                pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pickle' %(param_names[0],param_names[1]), 'wb'))
+                pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pkl' %(param_names[0],param_names[1]), 'wb'))
             return plt
 
     def generate_marginal(self, param, resolution=100):
