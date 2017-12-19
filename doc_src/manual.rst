@@ -55,6 +55,9 @@ More functions
     * **f.get_most_important_pairwise_marginals(params)**
 
     Returns the pairwise marginals of all elements in the list.
+    
+    * **f.get_triple_marginals(params)**
+    Returns the marginals of all possible triplets in the list. They are sorted by importance.
 
 
     * **fANOVA.marginal_mean_variance_for_values(p, v)**
