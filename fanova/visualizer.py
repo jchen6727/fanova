@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 class Visualizer(object):
 
-    def __init__(self, fanova, cs, directory):
+    def __init__(self, fanova, cs, directory, y_label='Performance'):
         """        
         Parameters
         ------------
@@ -28,6 +28,7 @@ class Visualizer(object):
         self.cs_params = cs.get_hyperparameters()
         assert os.path.exists(directory), "directory %s doesn't exist" % directory
         self.directory = directory
+        self._y_label = y_label
 
     def create_all_plots(self, **kwargs):
         """
@@ -167,7 +168,7 @@ class Visualizer(object):
                 plt.yticks(np.arange(0,len(choices[1])), choices[1], fontsize=8)
                 plt.xlabel(param_names[0])
                 plt.ylabel(param_names[1])
-                plt.colorbar().set_label("Performance")
+                plt.colorbar().set_label(self._y_label)
                 
                 if show:
                     plt.show()
@@ -180,7 +181,7 @@ class Visualizer(object):
                 for i, cat in enumerate(cats):
                     plt.plot(zz[i], label='%s' %cat)
                 plt.title('%s and %s' %(param_names[0], param_names[1]))
-                plt.ylabel('Performance')
+                plt.ylabel(self._y_label)
                 plt.xlabel(x_label)
                 plt.legend()
                 plt.tight_layout()
@@ -193,20 +194,21 @@ class Visualizer(object):
             fig = plt.figure()
             ax = Axes3D(fig)
     
-            surface = ax.plot_surface(display_xx, display_yy, zz, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
+            surface = ax.plot_surface(display_xx, display_yy, zz, rstride=1, cstride=1, cmap=cm.jet, linewidth=0,
+                                      antialiased=False)
             ax.set_xlabel(param_names[0])
             ax.set_ylabel(param_names[1])
-            ax.set_zlabel("Performance")
+            ax.set_zlabel(self._y_label)
             plt.title('%s and %s' %(param_names[0], param_names[1]))
             fig.colorbar(surface, shrink=0.5, aspect=5)
             if show:
                 plt.show()
             else:
                 interact_dir = self.directory + '/interactive_plots'
-                print('creating %s/interactive_plots' %self.directory)
+                print('creating %s/interactive_plots' % self.directory)
                 if not os.path.exists(interact_dir):
                     os.makedirs(interact_dir)
-                pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pkl' %(param_names[0],param_names[1]), 'wb'))
+                pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pkl' %(param_names[0], param_names[1]), 'wb'))
             return plt
 
     def generate_marginal(self, param, resolution=100):
@@ -308,7 +310,7 @@ class Visualizer(object):
             
             plt.ylim([min_y, max_y])
             
-            plt.ylabel("Performance")
+            plt.ylabel(self._y_label)
             plt.xlabel(param_name)
             plt.tight_layout()
             
@@ -331,7 +333,7 @@ class Visualizer(object):
             plt.fill_between(grid, upper_curve, lower_curve, facecolor='red', alpha=0.6)
             plt.xlabel(param_name)
             
-            plt.ylabel("Performance")
+            plt.ylabel(self._y_label)
             plt.tight_layout()
             
         if show:
