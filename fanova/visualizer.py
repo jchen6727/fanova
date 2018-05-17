@@ -30,7 +30,7 @@ class Visualizer(object):
         self.directory = directory
         self._y_label = y_label
 
-    def create_all_plots(self, **kwargs):
+    def create_all_plots(self, three_d=True,**kwargs):
         """
         Creates plots for all main effects and stores them into a directory
         
@@ -59,7 +59,7 @@ class Visualizer(object):
             param_names = re.sub('[!,@#\'\n$\[\]]', '', param_names)
             outfile_name = os.path.join(self.directory, str(param_names).replace(" ","_") + ".png")
             print("creating %s" % outfile_name)
-            self.plot_pairwise_marginal(combi, **kwargs)
+            self.plot_pairwise_marginal(combi, three_d=three_d,**kwargs)
             plt.savefig(outfile_name)
 
     def generate_pairwise_marginal(self, param_indices, resolution=20):
@@ -91,8 +91,6 @@ class Visualizer(object):
                     lower_bound = self.cs_params[p].lower
                     upper_bound = self.cs_params[p].upper
                     grid = np.linspace(lower_bound, upper_bound, resolution)
-                    if self.fanova.config_on_hypercube:
-                        grid = self.cs_params[p]._transform(grid)
                     choice_arr.append(grid)
                     choice_vals.append(grid)
                     
@@ -121,8 +119,6 @@ class Visualizer(object):
                 upper_bound = self.cs_params[p].upper
                 param_names.append(self.cs_params[p].name)
                 grid = np.linspace(lower_bound, upper_bound, resolution)
-                if self.fanova.config_on_hypercube:
-                    grid = self.cs_params[p]._transform(grid)
                 grid_list.append(grid)
     
             zz = np.zeros([resolution * resolution])
@@ -134,7 +130,7 @@ class Visualizer(object):
     
             return grid_list, zz
 
-    def plot_pairwise_marginal(self, param_list, resolution=20, show=False):
+    def plot_pairwise_marginal(self, param_list, resolution=20, show=False, three_d=True):
         """
         Creates a plot of pairwise marginal of a selected parameters
         
@@ -188,19 +184,36 @@ class Visualizer(object):
                     
         else:
             grid_list, zz = self.generate_pairwise_marginal(param_indices, resolution)
-    
+
+            z_min, z_max = zz.min(), zz.max()
             display_xx, display_yy = np.meshgrid(grid_list[0], grid_list[1])
-    
+
+
             fig = plt.figure()
-            ax = Axes3D(fig)
-    
-            surface = ax.plot_surface(display_xx, display_yy, zz, rstride=1, cstride=1, cmap=cm.jet, linewidth=0,
+
+            if three_d: 
+                ax = Axes3D(fig)
+                surface = ax.plot_surface(display_xx, display_yy, zz, rstride=1, cstride=1, cmap=cm.jet, linewidth=0,
                                       antialiased=False)
-            ax.set_xlabel(param_names[0])
-            ax.set_ylabel(param_names[1])
-            ax.set_zlabel(self._y_label)
+                ax.set_xlabel(param_names[0])
+                ax.set_ylabel(param_names[1])
+                ax.set_zlabel(self._y_label)
+                fig.colorbar(surface, shrink=0.5, aspect=5)
+
+            else:
+                plt.pcolor(display_xx, display_yy, zz, cmap=cm.jet, vmin=z_min, vmax=z_max)
+                plt.xlabel(param_names[0])
+                
+                if self.cs_params[param_indices[0]].log:
+                    plt.xscale('log')
+                if self.cs_params[param_indices[1]].log:
+                    plt.yscale('log')
+                
+                plt.ylabel(param_names[1])
+                plt.colorbar()
+
             plt.title('%s and %s' %(param_names[0], param_names[1]))
-            fig.colorbar(surface, shrink=0.5, aspect=5)
+
             if show:
                 plt.show()
             else:
@@ -237,7 +250,7 @@ class Visualizer(object):
             std = np.sqrt(v)
             return mean, std
             
-        else:        
+        else:
             lower_bound = self.cs_params[param].lower
             upper_bound = self.cs_params[param].upper
             log = self.cs_params[param].log
@@ -263,8 +276,6 @@ class Visualizer(object):
                 (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
                 mean[i] = m
                 std[i] = np.sqrt(v)
-            if self.fanova.config_on_hypercube:
-                grid = self.cs_params[param]._transform(grid)
             return mean, std, grid
 
     def plot_marginal(self, param, resolution=100, log_scale=None, show=True):
@@ -343,7 +354,7 @@ class Visualizer(object):
         
             
         
-    def create_most_important_pairwise_marginal_plots(self, params=None, n=20):
+    def create_most_important_pairwise_marginal_plots(self, params=None, n=20, three_d=True):
         """
         Creates plots of the n most important pairwise marginals of the whole ConfigSpace
         
@@ -370,6 +381,6 @@ class Visualizer(object):
             param_names = re.sub('[!,@#\'\n$\[\]]', '', param_names)
             outfile_name = os.path.join(self.directory, str(param_names).replace(" ","_") + ".png")
             print("creating %s" % outfile_name)
-            self.plot_pairwise_marginal((param1, param2), show=False)
+            self.plot_pairwise_marginal((param1, param2), show=False, three_d=three_d)
             plt.savefig(outfile_name)
 
