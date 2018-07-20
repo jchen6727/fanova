@@ -305,9 +305,13 @@ class fANOVA(object):
                 if type(dims[0]) == str:
                     importance_dict[dim_names]['individual importance'] = np.mean(fractions_individual)
                     importance_dict[dim_names]['total importance'] = np.mean(fractions_total)
+                    importance_dict[dim_names]['individual std'] = np.std(fractions_individual)
+                    importance_dict[dim_names]['total std'] = np.std(fractions_total)
                 else:
                     importance_dict[sub_dims]['individual importance'] = np.mean(fractions_individual)
                     importance_dict[sub_dims]['total importance'] = np.mean(fractions_total)
+                    importance_dict[sub_dims]['individual std'] = np.std(fractions_individual)
+                    importance_dict[sub_dims]['total std'] = np.std(fractions_total)
                 
         return(importance_dict)
         
