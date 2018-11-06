@@ -4,6 +4,7 @@ import numpy as np
 import warnings
 import pickle
 import re
+import logging
 
 import matplotlib.pyplot as plt
 import itertools as it
@@ -29,6 +30,7 @@ class Visualizer(object):
         assert os.path.exists(directory), "directory %s doesn't exist" % directory
         self.directory = directory
         self._y_label = y_label
+        self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
     def create_all_plots(self, three_d=True,**kwargs):
         """
@@ -41,7 +43,7 @@ class Visualizer(object):
             param_name = self.cs_params[param].name
             plt.close()
             outfile_name = os.path.join(self.directory, param_name.replace(os.sep, "_") + ".png")
-            print("creating %s" % outfile_name)
+            self.logger.info("creating %s" % outfile_name)
             
             self.plot_marginal(param, show=False, **kwargs)
             plt.savefig(outfile_name)
@@ -58,7 +60,7 @@ class Visualizer(object):
             param_names = str(param_names)
             param_names = re.sub('[!,@#\'\n$\[\]]', '', param_names)
             outfile_name = os.path.join(self.directory, str(param_names).replace(" ","_") + ".png")
-            print("creating %s" % outfile_name)
+            self.logger.info("creating %s" % outfile_name)
             self.plot_pairwise_marginal(combi, three_d=three_d,**kwargs)
             plt.savefig(outfile_name)
 
@@ -218,7 +220,7 @@ class Visualizer(object):
                 plt.show()
             else:
                 interact_dir = self.directory + '/interactive_plots'
-                print('creating %s/interactive_plots' % self.directory)
+                self.logger.info('creating %s/interactive_plots' % self.directory)
                 if not os.path.exists(interact_dir):
                     os.makedirs(interact_dir)
                 pickle.dump(fig, open(interact_dir + '/%s_%s.fig.pkl' %(param_names[0], param_names[1]), 'wb'))
@@ -380,7 +382,7 @@ class Visualizer(object):
             param_names = str(param_names)
             param_names = re.sub('[!,@#\'\n$\[\]]', '', param_names)
             outfile_name = os.path.join(self.directory, str(param_names).replace(" ","_") + ".png")
-            print("creating %s" % outfile_name)
+            self.logger.info("creating %s" % outfile_name)
             self.plot_pairwise_marginal((param1, param2), show=False, three_d=three_d)
             plt.savefig(outfile_name)
 

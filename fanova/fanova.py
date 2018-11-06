@@ -1,6 +1,7 @@
 import numpy as np
 from collections import OrderedDict
 import itertools as it
+import logging
 import pyrfr.regression as reg
 import pyrfr.util
 import ConfigSpace
@@ -45,6 +46,8 @@ class fANOVA(object):
         
         max_depth: maximal depth of each tree in the forest
         """
+        loggin.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         pcs = [(np.nan, np.nan)]*X.shape[1]
 
@@ -116,7 +119,7 @@ class fANOVA(object):
             try:
                 data.add_data_point(X[i].tolist(),Y[i])
             except:
-                print("failed to process datapoint:", X[i].tolist())
+                self.logger.warning("failed to process datapoint: %s", str(X[i].tolist()))
                 raise
         
         forest.fit(data, rng)
@@ -248,7 +251,7 @@ class fANOVA(object):
             for i, (m, s) in enumerate(zip(prod_midpoints, prod_sizes)):
                 sample[list(dimensions)] = list(m)
                 ls = self.the_forest.marginal_prediction_stat_of_tree(tree_idx, sample.tolist())
-                #print(sample, ls.mean())
+                #self.logger.debug("%s, %s", (sample, ls.mean()))
                 if not np.isnan(ls.mean()):
                     stat.push( ls.mean(), np.prod(np.array(s)) * ls.sum_of_weights())
             
