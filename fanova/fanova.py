@@ -46,7 +46,7 @@ class fANOVA(object):
         
         max_depth: maximal depth of each tree in the forest
         """
-        loggin.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         pcs = [(np.nan, np.nan)]*X.shape[1]
