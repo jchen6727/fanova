@@ -12,6 +12,7 @@ setup(
                         'docutils>=0.3',
                         'setuptools',
                         'matplotlib>=1.4.2',
+                        'pyrfr>=0.5.0',
                         'ConfigSpace'],
 
     author = "Stefan Falkner and Christina Hernandez Wunsch. Legacy branch: Tobias Domhan, Aaron Klein and Frank Hutter (FANOVA)",
