@@ -5,7 +5,7 @@ with open("fanova/__version__.py") as fh:
 
 setup(
     name = "fanova",
-    version = "2.0.3",
+    version = version,
     packages = find_packages(),
     install_requires = [
                         'numpy',
