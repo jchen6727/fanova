@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
 
+with open("fanova/__version__.py") as fh:
+    version = fh.readlines()[-1].split()[-1].strip("\"'")
+
 setup(
     name = "fanova",
-    version = "2.0.3",
+    version = version,
     packages = find_packages(),
     install_requires = [
                         'numpy',
