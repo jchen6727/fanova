@@ -185,7 +185,7 @@ class fANOVA(object):
         
 
         
-    def set_cutoffs(self, cutoffs = (-np.inf, np.inf)):
+    def set_cutoffs(self, cutoffs = (-np.inf, np.inf), quantile=None):
         """
             Setting the cutoffs to constrain the input space
             
@@ -196,8 +196,14 @@ class fANOVA(object):
             "Generalized Functional ANOVA Diagnostics for High Dimensional
             Functions of Dependent Variables" by Hooker.
         """
-        self.cutoffs = cutoffs
-        self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
+        if not (quantile is None):
+            percentile1 = self.percentiles[quantile[0]]
+            percentile2 = self.percentiles[quantile[1]]
+            self.the_forest.set_cutoffs(percentile1, percentile2)
+        else:
+
+            self.cutoffs = cutoffs
+            self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
         
         # reset all the variance fractions computed
         self.trees_variance_fractions = {}
