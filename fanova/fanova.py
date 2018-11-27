@@ -45,6 +45,11 @@ class fANOVA(object):
         min_samples_leaf: minimum number of samples required in a leaf
         
         max_depth: maximal depth of each tree in the forest
+
+        cutoffs: tuple of (lower, upper), all values outside this range will be
+                 mapped to either the lower or the upper bound. (See:
+                 "Generalized Functional ANOVA Diagnostics for High Dimensional
+                 Functions of Dependent Variables" by Hooker.)
         """
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
@@ -180,7 +185,7 @@ class fANOVA(object):
         
 
         
-    def set_cutoffs(self, cutoffs = (-np.inf, np.inf), quantile=None):
+    def set_cutoffs(self, cutoffs = (-np.inf, np.inf)):
         """
             Setting the cutoffs to constrain the input space
             
@@ -191,14 +196,8 @@ class fANOVA(object):
             "Generalized Functional ANOVA Diagnostics for High Dimensional
             Functions of Dependent Variables" by Hooker.
         """
-        if not (quantile is None):
-            percentile1 = self.percentiles[quantile[0]]
-            percentile2 = self.percentiles[quantile[1]]
-            self.the_forest.set_cutoffs(percentile1, percentile2)
-        else:
-            
-            self.cutoffs = cutoffs
-            self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
+        self.cutoffs = cutoffs
+        self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
         
         # reset all the variance fractions computed
         self.trees_variance_fractions = {}
