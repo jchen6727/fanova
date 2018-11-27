@@ -187,21 +187,20 @@ class fANOVA(object):
         
     def set_cutoffs(self, cutoffs = (-np.inf, np.inf), quantile=None):
         """
-            Setting the cutoffs to constrain the input space
-            
-            To properly do things like 'improvement over default' the
-            fANOVA now supports cutoffs on the y values. These will exclude
-            parts of the parameters space where the prediction is not within
-            the provided cutoffs. This is is specialization of 
-            "Generalized Functional ANOVA Diagnostics for High Dimensional
-            Functions of Dependent Variables" by Hooker.
+        Setting the cutoffs to constrain the input space
+
+        To properly do things like 'improvement over default' the
+        fANOVA now supports cutoffs on the y values. These will exclude
+        parts of the parameters space where the prediction is not within
+        the provided cutoffs. This is is specialization of
+        "Generalized Functional ANOVA Diagnostics for High Dimensional
+        Functions of Dependent Variables" by Hooker.
         """
         if not (quantile is None):
             percentile1 = self.percentiles[quantile[0]]
             percentile2 = self.percentiles[quantile[1]]
             self.the_forest.set_cutoffs(percentile1, percentile2)
         else:
-
             self.cutoffs = cutoffs
             self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
         
