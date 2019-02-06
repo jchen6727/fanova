@@ -45,11 +45,6 @@ class fANOVA(object):
         min_samples_leaf: minimum number of samples required in a leaf
         
         max_depth: maximal depth of each tree in the forest
-
-        cutoffs: tuple of (lower, upper), all values outside this range will be
-                 mapped to either the lower or the upper bound. (See:
-                 "Generalized Functional ANOVA Diagnostics for High Dimensional
-                 Functions of Dependent Variables" by Hooker.)
         """
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
@@ -82,7 +77,8 @@ class fANOVA(object):
             else:
                 unique_vals = set(X[:, i])
                 if len(unique_vals) > len(self.cs_params[i].choices):
-                    raise RuntimeError('There are some categoricals missing in the ConfigSpace specification')
+                    missing = unique_vals - set(self.cs_params[i].choices)
+                    raise RuntimeError('There are some categoricals missing in the ConfigSpace specification: %s' % missing)
 
         # initialize all types as 0
         types = np.zeros(len(self.cs_params), dtype=np.uint)
@@ -187,20 +183,21 @@ class fANOVA(object):
         
     def set_cutoffs(self, cutoffs = (-np.inf, np.inf), quantile=None):
         """
-        Setting the cutoffs to constrain the input space
-
-        To properly do things like 'improvement over default' the
-        fANOVA now supports cutoffs on the y values. These will exclude
-        parts of the parameters space where the prediction is not within
-        the provided cutoffs. This is is specialization of
-        "Generalized Functional ANOVA Diagnostics for High Dimensional
-        Functions of Dependent Variables" by Hooker.
+            Setting the cutoffs to constrain the input space
+            
+            To properly do things like 'improvement over default' the
+            fANOVA now supports cutoffs on the y values. These will exclude
+            parts of the parameters space where the prediction is not within
+            the provided cutoffs. This is is specialization of 
+            "Generalized Functional ANOVA Diagnostics for High Dimensional
+            Functions of Dependent Variables" by Hooker.
         """
         if not (quantile is None):
             percentile1 = self.percentiles[quantile[0]]
             percentile2 = self.percentiles[quantile[1]]
             self.the_forest.set_cutoffs(percentile1, percentile2)
         else:
+            
             self.cutoffs = cutoffs
             self.the_forest.set_cutoffs(cutoffs[0], cutoffs[1])
         
