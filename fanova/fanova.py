@@ -108,10 +108,9 @@ class fANOVA(object):
             elif isinstance(self.cs_params[i], NumericalHyperparameter):
                 pcs[i] = (hp.lower, hp.upper)
             elif isinstance(self.cs_params[i], (UnParametrizedHyperparameter, Constant)):
-                pcs[i] = (hp.value, hp.value)
+                raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
             else:
-                raise TypeError('Unsupported Hyperparameter: %s' % type(hp.name))
-                
+                raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
 
         # set forest options
         forest = reg.fanova_forest()
