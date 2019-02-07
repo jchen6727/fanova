@@ -85,12 +85,12 @@ class fANOVA(object):
                     raise RuntimeError('There are some categoricals missing in the ConfigSpace specification for hyperparameter %s:' % self.cs_params[i].name)
             elif isinstance(self.cs_params[i], (UnParametrizedHyperparameter, Constant)):
                 # oddly, unparameterizedhyperparameter and constant are not supported. 
-                raise TypeError('Unsupported Hyperparameter: %s' % type(hp.name))
+                raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i]))
                 # unique_vals = set(X[:, i])
                 # if len(unique_vals) > 1:
                 #     raise RuntimeError('Got multiple values for Unparameterized (Constant) hyperparameter')
             else:
-                raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i].name))
+                raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i]))
         
         if not np.issubdtype(X.dtype, np.float64):
             logging.warning('low level library expects X argument to be float')
