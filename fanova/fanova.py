@@ -5,7 +5,7 @@ import logging
 import pyrfr.regression as reg
 import pyrfr.util
 import ConfigSpace
-from ConfigSpace.hyperparameters import CategoricalHyperparameter, UniformFloatHyperparameter
+from ConfigSpace.hyperparameters import CategoricalHyperparameter, UniformFloatHyperparameter, NumericalHyperparameter, UnParametrizedHyperparameter, Constant
 
 
 class fANOVA(object):
@@ -21,9 +21,9 @@ class fANOVA(object):
         
         Parameters
         ------------
-        X: matrix with the features
+        X: matrix with the features (numerically encoded)
         
-        Y: vector with the response values
+        Y: vector with the response values (numerically encoded)
         
         config_space : ConfigSpace instantiation
         
@@ -75,15 +75,27 @@ class fANOVA(object):
         if X.shape[1] != len(self.cs_params):
             raise RuntimeError('Number of parameters in ConfigSpace object does not match input X')
         for i in range(len(self.cs_params)):
-            if not isinstance(self.cs_params[i], (CategoricalHyperparameter)):
+            if isinstance(self.cs_params[i], NumericalHyperparameter):
                 if (np.max(X[:, i]) > self.cs_params[i].upper) or \
                         (np.min(X[:, i]) < self.cs_params[i].lower):
                     raise RuntimeError('Some sample values from X are not in the given interval')
-            else:
+            elif isinstance(self.cs_params[i], CategoricalHyperparameter):
                 unique_vals = set(X[:, i])
                 if len(unique_vals) > len(self.cs_params[i].choices):
-                    missing = unique_vals - set(self.cs_params[i].choices)
-                    raise RuntimeError('There are some categoricals missing for hyperparameter %s in the ConfigSpace specification: %s' % (self.cs_params[i].name, missing))
+                    raise RuntimeError('There are some categoricals missing in the ConfigSpace specification for hyperparameter %s:' % self.cs_params[i].name)
+            elif isinstance(self.cs_params[i], (UnParametrizedHyperparameter, Constant)):
+                # oddly, unparameterizedhyperparameter and constant are not supported. 
+                raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i]))
+                # unique_vals = set(X[:, i])
+                # if len(unique_vals) > 1:
+                #     raise RuntimeError('Got multiple values for Unparameterized (Constant) hyperparameter')
+            else:
+                raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i]))
+        
+        if not np.issubdtype(X.dtype, np.float64):
+            logging.warning('low level library expects X argument to be float')
+        if not np.issubdtype(Y.dtype, np.float64):
+            logging.warning('low level library expects Y argument to be float')
 
         # initialize all types as 0
         types = np.zeros(len(self.cs_params), dtype=np.uint)
@@ -93,8 +105,12 @@ class fANOVA(object):
             if isinstance(hp, CategoricalHyperparameter):
                 types[i] = len(hp.choices)
                 pcs[i] = (len(hp.choices), np.nan)
-            else:
+            elif isinstance(self.cs_params[i], NumericalHyperparameter):
                 pcs[i] = (hp.lower, hp.upper)
+            elif isinstance(self.cs_params[i], (UnParametrizedHyperparameter, Constant)):
+                raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
+            else:
+                raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
 
         # set forest options
         forest = reg.fanova_forest()
