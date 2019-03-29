@@ -132,7 +132,8 @@ class Visualizer(object):
 
             return grid_list, zz
 
-    def plot_pairwise_marginal(self, param_list, resolution=20, show=False, three_d=True, colormap=cm.jet):
+    def plot_pairwise_marginal(self, param_list, resolution=20, show=False, three_d=True, colormap=cm.jet,
+                               add_colorbar=True):
         """
         Creates a plot of pairwise marginal of a selected parameters
 
@@ -153,6 +154,9 @@ class Visualizer(object):
 
         colormap: matplotlib.Colormap
             which colormap to use for the 3D plots
+
+        add_colorbar: bool
+            whether to add the colorbar for 3d plots
         """
         assert len(param_list) == 2, "You have to specify 2 (different) parameters"
         param_names, param_indices= [], []
@@ -206,7 +210,8 @@ class Visualizer(object):
                 ax.set_xlabel(param_names[0])
                 ax.set_ylabel(param_names[1])
                 ax.set_zlabel(self._y_label)
-                fig.colorbar(surface, shrink=0.5, aspect=5)
+                if add_colorbar:
+                    fig.colorbar(surface, shrink=0.5, aspect=5)
 
             else:
                 plt.pcolor(display_xx, display_yy, zz, cmap=colormap, vmin=z_min, vmax=z_max)
