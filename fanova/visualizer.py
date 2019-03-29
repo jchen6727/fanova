@@ -352,7 +352,7 @@ class Visualizer(object):
 
             # PREPROCESS
             if log_scale is None:
-                log_scale = self.cs_params[param].log or (np.diff(grid).std() > 0.000001)
+                log_scale = self.cs_params[param].log #or (np.diff(grid).std() > 0.000001) JvR: removed. see #85
 
             mean, std, grid = self.generate_marginal(param_idx, resolution)
             mean = np.asarray(mean)
