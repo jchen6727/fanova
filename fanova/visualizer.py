@@ -343,12 +343,12 @@ class Visualizer(object):
         else:
 
             # PREPROCESS
-            if log_scale is None:
-                log_scale = self.cs_params[param].log or (np.diff(grid).std() > 0.000001)
-
             mean, std, grid = self.generate_marginal(param_idx, resolution)
             mean = np.asarray(mean)
             std = np.asarray(std)
+
+            if log_scale is None:
+                log_scale = self.cs_params[param].log or (np.diff(grid).std() > 0.000001)
 
             lower_curve = mean - std
             upper_curve = mean + std
