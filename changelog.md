@@ -1,3 +1,9 @@
+# 2.0.13
+
+## Bug fixes
+
+* Unassigned variable for marginal plot
+
 # 2.0.12
 
 ## Major Changes
