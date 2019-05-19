@@ -83,9 +83,10 @@ class fANOVA(object):
                 unique_vals = set(X[:, i])
                 if len(unique_vals) > len(self.cs_params[i].choices):
                     raise RuntimeError('There are some categoricals missing in the ConfigSpace specification for hyperparameter %s:' % self.cs_params[i].name)
-            elif isinstance(self.cs_params[i], (UnParametrizedHyperparameter, Constant)):
+            elif isinstance(self.cs_params[i], (Constant)):
                 # oddly, unparameterizedhyperparameter and constant are not supported. 
-                raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i]))
+                # raise TypeError('Unsupported Hyperparameter: %s' % type(self.cs_params[i]))
+                pass
                 # unique_vals = set(X[:, i])
                 # if len(unique_vals) > 1:
                 #     raise RuntimeError('Got multiple values for Unparameterized (Constant) hyperparameter')
@@ -107,8 +108,10 @@ class fANOVA(object):
                 pcs[i] = (len(hp.choices), np.nan)
             elif isinstance(self.cs_params[i], NumericalHyperparameter):
                 pcs[i] = (hp.lower, hp.upper)
-            elif isinstance(self.cs_params[i], (UnParametrizedHyperparameter, Constant)):
-                raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
+            elif isinstance(self.cs_params[i], (Constant)):
+                # raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
+                types[i] = 1
+                pcs[i] = (1, np.nan)
             else:
                 raise TypeError('Unsupported Hyperparameter: %s' % type(hp))
 

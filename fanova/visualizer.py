@@ -1,4 +1,4 @@
-from ConfigSpace.hyperparameters import CategoricalHyperparameter
+from ConfigSpace.hyperparameters import CategoricalHyperparameter, Constant
 import os
 import numpy as np
 import warnings
@@ -257,11 +257,14 @@ class Visualizer(object):
         """
         if type(param) == str:
             param = self.cs.get_idx_by_hyperparameter_name(param)
-
-        if isinstance(self.cs_params[param], (CategoricalHyperparameter)):
+        if isinstance(self.cs_params[param], (CategoricalHyperparameter, Constant)):
             param_name = self.cs_params[param].name
-            labels= self.cs_params[param].choices
-            categorical_size  = len(self.cs_params[param].choices)
+            try:
+                labels= self.cs_params[param].choices
+                categorical_size  = len(self.cs_params[param].choices)
+            except AttributeError:
+                labels = str(self.cs_params[param])
+                categorical_size = 1
             marginals = [self.fanova.marginal_mean_variance_for_values([param], [i]) for i in range(categorical_size)]
             mean, v = list(zip(*marginals))
             std = np.sqrt(v)
@@ -325,10 +328,14 @@ class Visualizer(object):
         param_name = self.cs_params[param_idx].name
 
         # check if categorical
-        if isinstance(self.cs_params[param_idx], (CategoricalHyperparameter)):
+        if isinstance(self.cs_params[param_idx], (CategoricalHyperparameter, Constant)):
             # PREPROCESS
-            labels = self.cs_params[param_idx].choices
-            categorical_size = len(self.cs_params[param_idx].choices)
+            try:
+                labels = self.cs_params[param_idx].choices
+                categorical_size = len(self.cs_params[param_idx].choices)
+            except AttributeError:
+                labels = str(self.cs_params[param_idx])
+                categorical_size = 1
             indices = np.arange(1, categorical_size+1, 1)
             mean, std = self.generate_marginal(param_idx)
             min_y = mean[0]
