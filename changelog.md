@@ -1,3 +1,16 @@
+# 2.0.14
+
+## Minor Changes
+
+* Add try-except to pickling pairwise plots now fails silently (on info-level)
+* Add support for Constant hyperparameters
+* Beautify code in visualizer-class
+
+## Bug fixes
+
+* Fix axis on pairwise mixed cat/non-cat plots
+* Fix visualizer's `create_all_plots`
+
 # 2.0.13
 
 ## Bug fixes
