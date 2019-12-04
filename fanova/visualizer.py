@@ -98,7 +98,13 @@ class Visualizer(object):
                 grid_orig.append(p.choices)
                 grid_fanova.append(np.arange(len(p.choices)))
             else:
-                grid = np.linspace(p.lower, p.upper, resolution)
+                if p.log:
+                    base = np.e  # assuming ConfigSpace uses the natural logarithm
+                    log_lower = np.log(p.lower) / np.log(base)
+                    log_upper = np.log(p.upper) / np.log(base)
+                    grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
+                else:
+                    grid = np.linspace(p.lower, p.upper, resolution)
                 grid_orig.append(grid)
                 grid_fanova.append(grid)
 
@@ -170,10 +176,14 @@ class Visualizer(object):
                 # Only one of them is categorical -> create multi-line-plot
                 # Make sure categorical is first in indices (for iteration below)
                 param_indices = param_indices if first_is_cat else param_indices[::-1]
+                params = params if first_is_cat else params[::-1]
                 choices, zz = self.generate_pairwise_marginal(param_indices, resolution)
 
                 for i, cat in enumerate(choices[0]):
-                    plt.plot(choices[1], zz[i], label='%s' % str(cat))
+                    if params[1].log:
+                        plt.semilogx(choices[1], zz[i],label='%s' % str(cat))
+                    else:
+                        plt.plot(choices[1], zz[i], label='%s' % str(cat))
 
                 plt.ylabel(self._y_label)
                 plt.xlabel(param_names[0] if second_is_cat else param_names[1])  # x-axis displays non-categorical
@@ -225,20 +235,20 @@ class Visualizer(object):
 
         return plt
 
-    def generate_marginal(self, param, resolution=100):
+    def generate_marginal(self, p, resolution=100):
         """
         Creates marginals of a selected parameter for own plots
 
         Parameters
         ----------
-        param: int or str
+        p: int or str
             Index of chosen parameter in the ConfigSpace (starts with 0) or name
         resolution: int
             Number of samples to generate from the parameter range as
             values to predict
 
         """
-        p, p_name, p_idx = self._get_parameter(param)
+        p, p_name, p_idx = self._get_parameter(p)
 
         if isinstance(p, (CategoricalHyperparameter, Constant)):
             try:
@@ -255,8 +265,7 @@ class Visualizer(object):
             upper_bound = p.upper
             log = p.log
             if log:
-                # JvR: my conjecture is that ConfigSpace uses the natural logarithm
-                base = np.e
+                base = np.e  # assuming ConfigSpace uses the natural logarithm
                 log_lower = np.log(lower_bound) / np.log(base)
                 log_upper = np.log(upper_bound) / np.log(base)
                 grid = np.logspace(log_lower, log_upper, resolution, endpoint=True, base=base)
@@ -271,7 +280,7 @@ class Visualizer(object):
             mean = np.zeros(resolution)
             std = np.zeros(resolution)
 
-            dim = [param]
+            dim = [p_idx]
             for i in range(0, resolution):
                 (m, v) = self.fanova.marginal_mean_variance_for_values(dim, [grid[i]])
                 mean[i] = m
