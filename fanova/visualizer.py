@@ -94,9 +94,12 @@ class Visualizer(object):
         grid_fanova, grid_orig = [], []
 
         for p in params:
-            if isinstance(p, (CategoricalHyperparameter)):
+            if isinstance(p, CategoricalHyperparameter):
                 grid_orig.append(p.choices)
                 grid_fanova.append(np.arange(len(p.choices)))
+            elif isinstance(p, Constant):
+                grid_orig.append((p.value,))
+                grid_fanova.append(np.arange(1))
             else:
                 if p.log:
                     base = np.e  # assuming ConfigSpace uses the natural logarithm
@@ -108,14 +111,16 @@ class Visualizer(object):
                 grid_orig.append(grid)
                 grid_fanova.append(grid)
 
-        # Turn into arrays
-        param_indices = np.array(param_indices).squeeze()
-        grid_fanova = np.array(grid_fanova).squeeze()
+        # Turn into arrays, squeeze all but the first two dimensions (to avoid squeezing away the dimension for Constants)
+        param_indices = np.array(param_indices)
+        param_indices = param_indices.reshape([s for i, s in enumerate(param_indices.shape) if i in [0, 1] or s != 1])
+        grid_fanova = np.array(grid_fanova)
+        grid_fanova = grid_fanova.reshape([s for i, s in enumerate(grid_fanova.shape) if i in [0, 1] or s != 1])
 
         # The swap-parameter is here because this was how I found this code and without understanding of the
         #   in-detail implementation of fANOVA I assume there is a reason for the first element of the fanova
         #   method marginal_mean_variance_for_values to expect the element with less elements as the first parameter
-        swap = len(grid_fanova[1] > len(grid_fanova[0]))
+        swap = len(grid_fanova[1]) > len(grid_fanova[0])
 
         # Populating the result
         zz = np.zeros((len(grid_fanova[0]), len(grid_fanova[1])))
@@ -154,8 +159,8 @@ class Visualizer(object):
 
         params, param_names, param_indices = self._get_parameter(param_list)
 
-        first_is_cat = isinstance(params[0], CategoricalHyperparameter)
-        second_is_cat = isinstance(params[1], CategoricalHyperparameter)
+        first_is_cat = isinstance(params[0], (CategoricalHyperparameter, Constant))
+        second_is_cat = isinstance(params[1], (CategoricalHyperparameter, Constant))
 
         plt.close()
         fig = plt.figure()
