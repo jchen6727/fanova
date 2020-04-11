@@ -1,3 +1,9 @@
+# 2.0.15
+
+## Bug fixes
+
+* Fix Constant-Handling and "swap"-axis logic (#93)
+
 # 2.0.14
 
 ## Minor Changes
