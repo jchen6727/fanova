@@ -1,3 +1,15 @@
+# 2.0.16
+
+## Minor Changes
+
+* Prepare `visualizer.py` for `OrdinalHyperparameter`s
+* Generally simplify code for maintainablitiy
+* `generate_pairwise_marginal` does NOT swap values anymore
+
+## Bug fixes
+
+* Fix inverted axes-bug (#96)
+
 # 2.0.15
 
 ## Bug fixes
