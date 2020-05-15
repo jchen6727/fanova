@@ -1,3 +1,9 @@
+# 2.0.17
+
+## Bug fixes
+
+* Fix #96, invert ticks and labels on categorical-categorical pairwise plot
+
 # 2.0.16
 
 ## Minor Changes
