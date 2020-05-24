@@ -9,6 +9,7 @@ setup(
     packages = find_packages(),
     install_requires = [
                         'numpy',
+                        'pandas',
                         'docutils>=0.3',
                         'setuptools',
                         'matplotlib>=1.4.2',
