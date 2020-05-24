@@ -1,8 +1,14 @@
-# 2.0.18.dev
+# 2.0.18
+
+## Major Changes
+
+* Allow for X-input as `pandas.DataFrame`, add pandas requirement, based on #95
+* Also, log a warning, if input might be misinterpreted
+* Add support for `OrdinalHyperparameter`
 
 ## Minor Changes
 
-* Allow for input as pandas Dataframe, add pandas requirement, based on #95
+* Refactor some code for PEP8 conformity
 
 # 2.0.17
 
