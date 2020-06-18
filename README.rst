@@ -7,3 +7,5 @@ Documentation
 -------------
 
 An 'ever growing' documentation for the Python bindings can be found at https://automl.github.io/fanova/
+
+**Note** *To use fANOVA please make sure to use SWIG version 3.0.12. If you experience problems, try using anaconda or reinstalling pyrfr (#102).*
