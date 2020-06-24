@@ -1,3 +1,9 @@
+# 2.0.19
+
+## Bug fixes
+
+* Fix #103, inverted labels in 3d-plot (using transpose)
+
 # 2.0.18
 
 ## Major Changes
